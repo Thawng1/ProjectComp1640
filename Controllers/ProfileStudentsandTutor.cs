@@ -20,22 +20,29 @@ namespace ProjectComp1640.Controllers
         [HttpGet("students")]
         public async Task<IActionResult> GetStudents()
         {
-            if(_context.Students.Any())
+            if (_context.Students.Any())
             {
-                return BadRequest("Student not found");
-            }
-            var students = await _context.Students
-                .Include(s => s.User)
-                .Select(s => new {
-                    s.Id,
-                    s.StudentCode,
-                    s.Course,
-                    s.Status,
-                    User = s.User != null ? new { s.User.Id, s.User.FullName, s.User.UserName, s.User.Email } : null
-                })
-                .ToListAsync();
 
-            return Ok(students);
+
+                var students = await _context.Students
+                   .Include(s => s.User)
+                   .Select(s => new
+                   {
+                       s.Id,
+                       s.StudentCode,
+                       s.Course,
+                       s.Status,
+                       User = s.User != null ? new { s.User.FullName, s.User.UserName, s.User.Email } : null
+                   })
+                   .ToListAsync();
+
+                return Ok(students);
+              
+            }
+            else
+            {
+                 return BadRequest("Student not found");
+            }
         }
 
         [Authorize(Roles = "Admin")]
@@ -45,20 +52,24 @@ namespace ProjectComp1640.Controllers
 
             if (_context.Tutors.Any())
             {
-                return BadRequest("Tutor not found");
-            }
-            var tutors = await _context.Tutors
-                .Include(t => t.User)
-                .Select(t => new {
-                    t.Id,
-                    t.Department,
-                    t.ExperienceYears,
-                    t.Rating,
-                    User = t.User != null ? new { t.User.Id, t.User.FullName, t.User.UserName, t.User.Email } : null
-                })
-                .ToListAsync();
+                var tutors = await _context.Tutors
+               .Include(t => t.User)
+               .Select(t => new {
+                   t.Id,
+                   t.Department,
+                   t.ExperienceYears,
+                   t.Rating,
+                   User = t.User != null ? new { t.User.FullName, t.User.UserName, t.User.Email } : null
+               })
+               .ToListAsync();
 
-            return Ok(tutors);
+                return Ok(tutors);
+               
+            }
+            else
+            {
+                return BadRequest("Student not found");
+            }
         }
 
         [Authorize(Roles = "Admin")]
