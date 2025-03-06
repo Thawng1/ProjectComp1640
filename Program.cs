@@ -42,6 +42,8 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+builder.Services.AddSingleton<EmailService>();
+
 // Kết nối Database
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {

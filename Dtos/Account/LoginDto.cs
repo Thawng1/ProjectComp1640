@@ -7,6 +7,6 @@ namespace ProjectComp1640.Dtos.Account
         [Required]
         public string Username { get; set; }
         [Required]
-        public string Password { get; set; }
+        public string Password { get; set; }    
     }
 }
