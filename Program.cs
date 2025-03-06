@@ -42,7 +42,7 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-builder.Services.AddSingleton<EmailService>();
+builder.Services.AddScoped<EmailService>();
 
 // Kết nối Database
 builder.Services.AddDbContext<ApplicationDBContext>(options =>

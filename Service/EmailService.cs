@@ -1,3 +1,4 @@
+﻿
 ﻿using System.Net;
 using System.Net.Mail;
 using Microsoft.AspNetCore.Identity;
@@ -10,10 +11,8 @@ public class EmailService
 
     public EmailService(IConfiguration config)
     {
-        _config = config;
         _emailSettings = config.GetSection("EmailSettings");
     }
-
 
     public async Task SendEmailAsync(string toEmail, string subject, string content)
     {

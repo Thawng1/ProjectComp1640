@@ -31,15 +31,15 @@ namespace ProjectComp1640.Controllers
             {
                 return NotFound("Email không tồn tại trong hệ thống.");
             }
-            // Tạo nội dung email
+            //Tạo nội dung email
             string subject = "Quên mật khẩu";
             string body = "<p>Bạn đã yêu cầu đặt lại mật khẩu. Nhấp vào link dưới để đặt lại:</p>" +
                           "<a href='https://yourapp.com/reset-password'>Đặt lại mật khẩu</a>";
 
             // Gửi email
-            _emailService.SendEmailAsync(email, subject, body);
+            await _emailService.SendEmailAsync(email, subject, body);
 
-            
+
 
             return Ok("Email đặt lại mật khẩu đã được gửi.");
         }
