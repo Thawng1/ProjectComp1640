@@ -20,10 +20,7 @@ namespace ProjectComp1640.Controllers
         [HttpGet("students")]
         public async Task<IActionResult> GetStudents()
         {
-            if(_context.Students.Any())
-            {
-                return BadRequest("Student not found");
-            }
+            
             var students = await _context.Students
                 .Include(s => s.User)
                 .Select(s => new {
@@ -36,6 +33,7 @@ namespace ProjectComp1640.Controllers
                 .ToListAsync();
 
             return Ok(students);
+            
         }
 
         [Authorize(Roles = "Admin")]
@@ -47,18 +45,22 @@ namespace ProjectComp1640.Controllers
             {
                 return BadRequest("Tutor not found");
             }
-            var tutors = await _context.Tutors
-                .Include(t => t.User)
-                .Select(t => new {
-                    t.Id,
-                    t.Department,
-                    t.ExperienceYears,
-                    t.Rating,
-                    User = t.User != null ? new { t.User.Id, t.User.FullName, t.User.UserName, t.User.Email } : null
-                })
-                .ToListAsync();
+            else
+            {
+                var tutors = await _context.Tutors
+                    .Include(t => t.User)
+                    .Select(t => new
+                    {
+                        t.Id,
+                        t.Department,
+                        t.ExperienceYears,
+                        t.Rating,
+                        User = t.User != null ? new { t.User.Id, t.User.FullName, t.User.UserName, t.User.Email } : null
+                    })
+                    .ToListAsync();
 
-            return Ok(tutors);
+                return Ok(tutors);
+            }
         }
 
         [Authorize(Roles = "Admin")]
