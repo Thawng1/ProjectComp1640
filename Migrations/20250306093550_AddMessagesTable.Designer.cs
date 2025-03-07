@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectComp1640.Data;
 
@@ -11,9 +12,11 @@ using ProjectComp1640.Data;
 namespace ProjectComp1640.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250306093550_AddMessagesTable")]
+    partial class AddMessagesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,19 +54,19 @@ namespace ProjectComp1640.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "082c5df7-fb73-45c8-9933-2c8378f1b34b",
+                            Id = "759aaefb-9232-4d0c-9c91-b0b7dfdb3dcc",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "74251a54-94d4-43ef-a931-a03a4a044ff9",
+                            Id = "3e80ebed-5616-4acd-af6b-b01ca9f8147f",
                             Name = "Tutor",
                             NormalizedName = "TUTOR"
                         },
                         new
                         {
-                            Id = "04b55201-50a4-4ff5-b18c-cc056a7c2914",
+                            Id = "3ef69a14-bc9a-4765-ac31-22d734e9d832",
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });

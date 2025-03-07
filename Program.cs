@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ProjectComp1640.Chat;
 using ProjectComp1640.Data;
 using ProjectComp1640.Interfaces;
 using ProjectComp1640.Model;
@@ -86,10 +87,28 @@ builder.Services.AddAuthentication(options =>
         ),
         ValidateLifetime = true
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/messageHub"))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
+
+
+
 
 // Thêm dịch vụ token
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -118,10 +137,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
+app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<MessageHub>("/MessageHub");  // **Thêm SignalR Hub**
+});
 app.MapControllers();
 app.Run();
 
