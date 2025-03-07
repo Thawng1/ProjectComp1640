@@ -14,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<MessageService>();
+
 
 builder.Services.AddSwaggerGen(option =>
 {
@@ -109,6 +111,17 @@ builder.Services.AddAuthentication(options =>
 // Thêm dịch vụ token
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddSignalR();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials()
+            .SetIsOriginAllowed(origin => true); // Cho phép tất cả domain
+    });
+});
 
 var app = builder.Build();
 
@@ -139,10 +152,9 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.UseEndpoints(endpoints =>
 {
