@@ -29,7 +29,7 @@ namespace ProjectComp1640.Controllers
                     s.StudentCode,
                     s.Course,
                     s.Status,
-                    User = s.User != null ? new { s.User.Id, s.User.FullName, s.User.UserName, s.User.Email } : null
+                    User = s.User != null ? new { s.User.FullName, s.User.UserName, s.User.Email } : null
                 })
                 .ToListAsync();
 
@@ -53,7 +53,7 @@ namespace ProjectComp1640.Controllers
                     t.Department,
                     t.ExperienceYears,
                     t.Rating,
-                    User = t.User != null ? new { t.User.Id, t.User.FullName, t.User.UserName, t.User.Email } : null
+                    User = t.User != null ? new { t.User.FullName, t.User.UserName, t.User.Email } : null
                 })
                 .ToListAsync();
                 return Ok(tutors);
