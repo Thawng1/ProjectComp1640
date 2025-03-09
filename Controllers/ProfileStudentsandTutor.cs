@@ -22,9 +22,7 @@ namespace ProjectComp1640.Controllers
         {
             if(_context.Students.Any())
             {
-                return BadRequest("Student not found");
-            }
-            var students = await _context.Students
+                var students = await _context.Students
                 .Include(s => s.User)
                 .Select(s => new {
                     s.Id,
@@ -35,7 +33,10 @@ namespace ProjectComp1640.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(students);
+                return Ok(students);
+               
+            }
+            return BadRequest("Student not found");
         }
 
         [Authorize(Roles = "Admin")]
@@ -45,9 +46,7 @@ namespace ProjectComp1640.Controllers
 
             if (_context.Tutors.Any())
             {
-                return BadRequest("Tutor not found");
-            }
-            var tutors = await _context.Tutors
+                var tutors = await _context.Tutors
                 .Include(t => t.User)
                 .Select(t => new {
                     t.Id,
@@ -57,8 +56,11 @@ namespace ProjectComp1640.Controllers
                     User = t.User != null ? new { t.User.Id, t.User.FullName, t.User.UserName, t.User.Email } : null
                 })
                 .ToListAsync();
+                return Ok(tutors);
+            }
+               return BadRequest("Tutor not found");
 
-            return Ok(tutors);
+          
         }
 
         [Authorize(Roles = "Admin")]
