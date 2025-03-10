@@ -15,6 +15,7 @@ namespace ProjectComp1640.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
+        private readonly EmailService _emailService;
         private readonly ApplicationDBContext _context;
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenService _tokenService;
@@ -26,6 +27,7 @@ namespace ProjectComp1640.Controllers
             UserManager<AppUser> userManager,
             ITokenService tokenService,
             SignInManager<AppUser> signInManager,
+            EmailService emailService,
             RoleManager<IdentityRole> roleManager)
         {
             _context = context;
@@ -33,6 +35,7 @@ namespace ProjectComp1640.Controllers
             _tokenService = tokenService;
             _signinManager = signInManager;
             _roleManager = roleManager;
+            _emailService = emailService;
         }
 
         [HttpPost("login")]
@@ -103,6 +106,9 @@ namespace ProjectComp1640.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+
+                await SendEmailRegister(registerDto.Email);
+
                 return Ok(new { Message = "Student registered successfully!" });
             }
             catch (Exception ex)
@@ -153,6 +159,9 @@ namespace ProjectComp1640.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+
+                await SendEmailRegister(registerDto.Email);
+
                 return Ok(new { Message = "Tutor registered successfully!" });
             }
             catch (Exception ex)
@@ -160,6 +169,20 @@ namespace ProjectComp1640.Controllers
                 return StatusCode(500, "An error occurred while saving data: " + ex.Message);
             }
         }
+        private async Task SendEmailRegister(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return;
+            }
+
+            string subject = "Register successfully";
+            string body = "<p>Bạn đã được đăng kí tài khoản thành công. Nhấp vào link dưới để đổi mật khẩu:</p>" +
+                          "<a href='https://yourapp.com/reset-password'>Đặt lại mật khẩu</a>";
+
+            await _emailService.SendEmailAsync(email, subject, body);
+        }
+
         [Authorize] // Yêu cầu người dùng đã đăng nhập mới có thể gọi API này
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
