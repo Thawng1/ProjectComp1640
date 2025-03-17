@@ -51,19 +51,19 @@ namespace ProjectComp1640.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "d04d0419-ab47-45d0-8121-410ebc6d4014",
+                            Id = "c4214cdd-b615-4ece-bb54-37b0bdc6f844",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "1ba33453-6f8f-45a7-8fa4-67afcfd20594",
+                            Id = "44c99fa6-b6ee-44fc-abca-bd241c418779",
                             Name = "Tutor",
                             NormalizedName = "TUTOR"
                         },
                         new
                         {
-                            Id = "357efb56-7ef7-4ab6-a9f8-cc66f5b5a668",
+                            Id = "5b251806-d74b-4a08-a0ee-6ad08c09f515",
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });
@@ -269,38 +269,6 @@ namespace ProjectComp1640.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("ProjectComp1640.Model.Messages", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReceiverId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SenderId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("Messages");
-                });
-
             modelBuilder.Entity("ProjectComp1640.Model.Student", b =>
                 {
                     b.Property<int>("Id")
@@ -427,25 +395,6 @@ namespace ProjectComp1640.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ProjectComp1640.Model.Messages", b =>
-                {
-                    b.HasOne("ProjectComp1640.Model.AppUser", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ProjectComp1640.Model.AppUser", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Student", b =>
