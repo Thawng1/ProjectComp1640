@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ProjectComp1640.Chat;
 using ProjectComp1640.Model;
+using ProjectComp1640.Dtos.Mess;
 
 namespace ProjectComp1640.Controllers
 {
@@ -18,24 +19,35 @@ namespace ProjectComp1640.Controllers
             _messageService = messageService;
         }
 
+        [Authorize] // Yêu cầu đăng nhập
         [HttpPost("send")]
         public async Task<IActionResult> SendMessage([FromBody] MessageDto messageDto)
         {
-            await _messageService.SendMessage(messageDto.SenderId, messageDto.ReceiverId, messageDto.Content);
+            var senderId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(senderId))
+                return Unauthorized("Không thể xác định người gửi.");
+
+            if (string.IsNullOrEmpty(messageDto.ReceiverId))
+                return BadRequest("Người nhận không hợp lệ.");
+
+            await _messageService.SendMessage(senderId, messageDto.ReceiverId, messageDto.Content);
+
             return Ok(new { message = "Tin nhắn đã gửi thành công!" });
         }
-
-        [HttpGet("conversation/{userId1}/{userId2}")]
-        public async Task<ActionResult<List<Messages>>> GetConversation(string userId1, string userId2)
+        [Authorize]
+        [HttpGet("conversation/{receiverId}")]
+        public async Task<IActionResult> GetConversation(string receiverId)
         {
-            var messages = await _messageService.GetMessages(userId1, userId2);
+            var senderId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(senderId))
+                return Unauthorized("Không thể xác định người gửi.");
+
+            var messages = await _messageService.GetMessages(senderId, receiverId);
+
             return Ok(messages);
         }
     }
-    public class MessageDto
-    {
-        public string SenderId { get; set; }
-        public string ReceiverId { get; set; }
-        public string Content { get; set; }
-    }
+
 }

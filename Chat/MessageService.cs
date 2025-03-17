@@ -27,7 +27,7 @@ namespace ProjectComp1640.Chat
             if (sender == null || receiver == null)
                 throw new Exception("Người gửi hoặc người nhận không tồn tại.");
 
-            // Kiểm tra chỉ student và tutor có thể gửi tin nhắn
+            // Kiểm tra chỉ Student và Tutor có thể gửi tin nhắn
             if (!await IsStudentOrTutor(sender) || !await IsStudentOrTutor(receiver))
                 throw new Exception("Chỉ Student và Tutor có thể nhắn tin!");
 
@@ -35,7 +35,8 @@ namespace ProjectComp1640.Chat
             {
                 SenderId = senderId,
                 ReceiverId = receiverId,
-                Content = content
+                Content = content,
+                SentAt = DateTime.UtcNow
             };
 
             _context.Messages.Add(message);
@@ -44,12 +45,11 @@ namespace ProjectComp1640.Chat
             // Gửi tin nhắn đến client của người nhận
             await _hubContext.Clients.User(receiverId).SendAsync("ReceiveMessage", senderId, content);
         }
-
-        public async Task<List<Messages>> GetMessages(string userId1, string userId2)
+        public async Task<List<Messages>> GetMessages(string senderId, string receiverId)
         {
             return await _context.Messages
-                .Where(m => m.SenderId == userId1 && m.ReceiverId == userId2 ||
-                            m.SenderId == userId2 && m.ReceiverId == userId1)
+                .Where(m => (m.SenderId == senderId && m.ReceiverId == receiverId) ||
+                            (m.SenderId == receiverId && m.ReceiverId == senderId))
                 .OrderBy(m => m.SentAt)
                 .ToListAsync();
         }
