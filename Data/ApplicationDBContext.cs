@@ -18,6 +18,7 @@ namespace ProjectComp1640.Data
         public DbSet<Messages> Messages { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<ClassStudent> ClassStudents { get; set; }
+        public DbSet<Subject> Subjects { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -32,23 +33,29 @@ namespace ProjectComp1640.Data
                 .WithMany()
                 .HasForeignKey(m => m.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<ClassStudent>()
                 .HasKey(sc => new { sc.StudentId, sc.ClassId });
             builder.Entity<ClassStudent>()
                 .HasOne(sc => sc.Student)
                 .WithMany(s => s.ClassStudents)
                 .HasForeignKey(sc => sc.StudentId);
-
             builder.Entity<ClassStudent>()
                 .HasOne(sc => sc.Class)
                 .WithMany(c => c.ClassStudents)
                 .HasForeignKey(sc => sc.ClassId);
-
             builder.Entity<Tutor>()
                 .HasMany(e => e.Classes)
                 .WithOne(e => e.Tutor)
                 .HasForeignKey(e => e.TutorId)
-                .IsRequired(false);
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+            builder.Entity<Subject>()
+                .HasMany(e => e.Classes)
+                .WithOne(e => e.Subject)
+                .HasForeignKey(e => e.SubjectId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
             List<IdentityRole> roles = new List<IdentityRole>
             {
                 new IdentityRole

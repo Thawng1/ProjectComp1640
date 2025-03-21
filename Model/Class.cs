@@ -5,12 +5,18 @@ namespace ProjectComp1640.Model
     public class Class
     {
         public int Id { get; set; }
-        public int? TutorId { get; set; }
-        public virtual Tutor? Tutor { get; set; }
-        public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
         [Required]
         public string ClassName { get; set; }
         public string? Description { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public int TotalSlot { get; set; }
+        //classroom can be created as a difference entities, and check condition of class schedule based on day and slot
+        //or create a new classroom attribute
+        public int? TutorId { get; set; }
+        public virtual Tutor? Tutor { get; set; }
+        public int? SubjectId { get; set; }
+        public virtual Subject? Subject { get; set; }
+        public virtual ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
+        public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
     }
 }

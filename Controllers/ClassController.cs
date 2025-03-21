@@ -36,6 +36,7 @@ namespace ProjectComp1640.Controllers
             var newClass = new Class
             {
                 TutorId = classDto.TutorId,
+                SubjectId = classDto.SubjectId,
                 ClassName = classDto.ClassName,
                 Description = classDto.Description,
                 ClassStudents = classDto.StudentIds.Select(id => new ClassStudent { StudentId = id }).ToList()
@@ -58,6 +59,7 @@ namespace ProjectComp1640.Controllers
             var classDTOs = classes.Select(c => new ClassDto
             {
                 TutorId = c.TutorId,
+                SubjectId = c.SubjectId,
                 ClassName = c.ClassName,
                 Description = c.Description,
                 StudentIds = c.ClassStudents.Select(cs => cs.StudentId).ToList()
@@ -81,6 +83,7 @@ namespace ProjectComp1640.Controllers
             var classDto = new ClassDto
             {
                 TutorId = cls.TutorId,
+                SubjectId = cls.SubjectId,
                 ClassName = cls.ClassName,
                 Description = cls.Description,
                 StudentIds = cls.ClassStudents.Select(cs => cs.StudentId).ToList()
@@ -98,6 +101,7 @@ namespace ProjectComp1640.Controllers
                 return NotFound();
             }
             checkClass.TutorId = classDto.TutorId;
+            checkClass.SubjectId = classDto.SubjectId;
             checkClass.ClassName = classDto.ClassName;
             checkClass.Description = classDto.Description;
             checkClass.ClassStudents = classDto.StudentIds.Select(id => new ClassStudent { StudentId = id, ClassId = id }).ToList();
@@ -127,10 +131,8 @@ namespace ProjectComp1640.Controllers
             {
                 return NotFound();
             }
-
             _context.Classes.Remove(cls);
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
     }
