@@ -11,5 +11,6 @@ namespace ProjectComp1640.Model
         public float Rating { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public virtual AppUser User { get; set; }
+        public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
     }
 }

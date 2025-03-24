@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectComp1640.Data;
 
@@ -11,9 +12,11 @@ using ProjectComp1640.Data;
 namespace ProjectComp1640.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250320042222_readdClass")]
+    partial class readdClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,19 +54,19 @@ namespace ProjectComp1640.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "eb282888-05cb-42d4-a962-91a43aeb3556",
+                            Id = "b57d62bd-572b-4629-ac6e-19942a4c06d9",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "fcf07427-8db7-4ae2-9f1a-a776fb1931d7",
+                            Id = "21d07253-5d1b-4559-8e94-c816ba2ac1a7",
                             Name = "Tutor",
                             NormalizedName = "TUTOR"
                         },
                         new
                         {
-                            Id = "941e2050-9a7d-45f5-b857-3b564ed89ca4",
+                            Id = "667ef105-762e-425a-a9db-a5114ae5753a",
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });
@@ -287,24 +290,10 @@ namespace ProjectComp1640.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("SubjectId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalSlot")
-                        .HasColumnType("int");
-
                     b.Property<int?>("TutorId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SubjectId");
 
                     b.HasIndex("TutorId");
 
@@ -324,23 +313,6 @@ namespace ProjectComp1640.Migrations
                     b.HasIndex("ClassId");
 
                     b.ToTable("ClassStudents");
-                });
-
-            modelBuilder.Entity("ProjectComp1640.Model.Classroom", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Classrooms");
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Messages", b =>
@@ -375,39 +347,6 @@ namespace ProjectComp1640.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("ProjectComp1640.Model.Schedule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ClassId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ClassroomId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Day")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ScheduleDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Slot")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
-
-                    b.HasIndex("ClassroomId");
-
-                    b.ToTable("Schedules");
-                });
-
             modelBuilder.Entity("ProjectComp1640.Model.Student", b =>
                 {
                     b.Property<int>("Id")
@@ -440,28 +379,6 @@ namespace ProjectComp1640.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Students");
-                });
-
-            modelBuilder.Entity("ProjectComp1640.Model.Subject", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Information")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SubjectName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Tutor", b =>
@@ -560,17 +477,9 @@ namespace ProjectComp1640.Migrations
 
             modelBuilder.Entity("ProjectComp1640.Model.Class", b =>
                 {
-                    b.HasOne("ProjectComp1640.Model.Subject", "Subject")
-                        .WithMany("Classes")
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("ProjectComp1640.Model.Tutor", "Tutor")
                         .WithMany("Classes")
-                        .HasForeignKey("TutorId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Subject");
+                        .HasForeignKey("TutorId");
 
                     b.Navigation("Tutor");
                 });
@@ -613,23 +522,6 @@ namespace ProjectComp1640.Migrations
                     b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("ProjectComp1640.Model.Schedule", b =>
-                {
-                    b.HasOne("ProjectComp1640.Model.Class", "Class")
-                        .WithMany("Schedules")
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("ProjectComp1640.Model.Classroom", "Classroom")
-                        .WithMany("Schedules")
-                        .HasForeignKey("ClassroomId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Class");
-
-                    b.Navigation("Classroom");
-                });
-
             modelBuilder.Entity("ProjectComp1640.Model.Student", b =>
                 {
                     b.HasOne("ProjectComp1640.Model.AppUser", "User")
@@ -655,23 +547,11 @@ namespace ProjectComp1640.Migrations
             modelBuilder.Entity("ProjectComp1640.Model.Class", b =>
                 {
                     b.Navigation("ClassStudents");
-
-                    b.Navigation("Schedules");
-                });
-
-            modelBuilder.Entity("ProjectComp1640.Model.Classroom", b =>
-                {
-                    b.Navigation("Schedules");
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Student", b =>
                 {
                     b.Navigation("ClassStudents");
-                });
-
-            modelBuilder.Entity("ProjectComp1640.Model.Subject", b =>
-                {
-                    b.Navigation("Classes");
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Tutor", b =>

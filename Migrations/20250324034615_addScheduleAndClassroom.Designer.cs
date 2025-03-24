@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectComp1640.Data;
 
@@ -11,9 +12,11 @@ using ProjectComp1640.Data;
 namespace ProjectComp1640.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250324034615_addScheduleAndClassroom")]
+    partial class addScheduleAndClassroom
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,19 +54,19 @@ namespace ProjectComp1640.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "eb282888-05cb-42d4-a962-91a43aeb3556",
+                            Id = "599c6165-e94a-4cfa-a65b-de5477a3abba",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "fcf07427-8db7-4ae2-9f1a-a776fb1931d7",
+                            Id = "ab912df8-9587-47eb-9bb5-26aaccc1ab80",
                             Name = "Tutor",
                             NormalizedName = "TUTOR"
                         },
                         new
                         {
-                            Id = "941e2050-9a7d-45f5-b857-3b564ed89ca4",
+                            Id = "242c39e6-621e-4373-a18f-2be49090d5ab",
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });
@@ -287,12 +290,6 @@ namespace ProjectComp1640.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int?>("SubjectId")
                         .HasColumnType("int");
 
@@ -391,9 +388,6 @@ namespace ProjectComp1640.Migrations
 
                     b.Property<int>("Day")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("ScheduleDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Slot")
                         .IsRequired()
