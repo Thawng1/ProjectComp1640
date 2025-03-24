@@ -11,5 +11,6 @@ namespace ProjectComp1640.Model
         public string Status { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public virtual AppUser User { get; set; }
+        public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
     }
 }

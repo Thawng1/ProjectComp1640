@@ -16,7 +16,11 @@ namespace ProjectComp1640.Data
         public DbSet<Student> Students { get; set; }
         public DbSet<Tutor> Tutors { get; set; }
         public DbSet<Messages> Messages { get; set; }
-
+        public DbSet<Class> Classes { get; set; }
+        public DbSet<ClassStudent> ClassStudents { get; set; }
+        public DbSet<Subject> Subjects { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
+        public DbSet<Classroom> Classrooms { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -32,6 +36,40 @@ namespace ProjectComp1640.Data
                 .HasForeignKey(m => m.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<ClassStudent>()
+                .HasKey(sc => new { sc.StudentId, sc.ClassId });
+            builder.Entity<ClassStudent>()
+                .HasOne(sc => sc.Student)
+                .WithMany(s => s.ClassStudents)
+                .HasForeignKey(sc => sc.StudentId);
+            builder.Entity<ClassStudent>()
+                .HasOne(sc => sc.Class)
+                .WithMany(c => c.ClassStudents)
+                .HasForeignKey(sc => sc.ClassId);
+            builder.Entity<Tutor>()
+                .HasMany(e => e.Classes)
+                .WithOne(e => e.Tutor)
+                .HasForeignKey(e => e.TutorId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+            builder.Entity<Subject>()
+                .HasMany(e => e.Classes)
+                .WithOne(e => e.Subject)
+                .HasForeignKey(e => e.SubjectId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+            builder.Entity<Schedule>()
+                .HasOne(s => s.Class)
+                .WithMany(s => s.Schedules)
+                .HasForeignKey(s => s.ClassId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+            builder.Entity<Classroom>()
+                .HasMany(clr => clr.Schedules)
+                .WithOne(clr => clr.Classroom)
+                .HasForeignKey(clr => clr.ClassroomId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
             List<IdentityRole> roles = new List<IdentityRole>
             {
                 new IdentityRole
