@@ -21,6 +21,7 @@ namespace ProjectComp1640.Data
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<Classroom> Classrooms { get; set; }
+        public DbSet<Blog> Blogs { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -70,6 +71,12 @@ namespace ProjectComp1640.Data
                 .HasForeignKey(clr => clr.ClassroomId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
+            builder.Entity<Blog>()
+               .HasOne(b => b.User)
+               .WithMany()
+               .HasForeignKey(b => b.UserId)
+               .OnDelete(DeleteBehavior.Restrict);
+
             List<IdentityRole> roles = new List<IdentityRole>
             {
                 new IdentityRole
