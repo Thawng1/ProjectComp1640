@@ -118,10 +118,7 @@ namespace ProjectComp1640.Controllers
                     ClassId = scheduleDto.ClassId,
                     ClassroomId = scheduleDto.ClassroomId
                 });
-                if (current.AddDays(7) <= cls.EndDate)
-                {
-                    current = current.AddDays(7);
-                }
+                current = current.AddDays(7);
             }
             _dbContext.Schedules.AddRange(schedules);
             await _dbContext.SaveChangesAsync();
