@@ -79,7 +79,7 @@ namespace ProjectComp1640.Controllers
             return Ok(blogs);
         }
         [Authorize]
-        [HttpGet("blogs/{id}")]
+        [HttpGet("/{id}")]
         public async Task<IActionResult> GetBlogsById(int id)
         {
             var blog = await _context.Blogs
