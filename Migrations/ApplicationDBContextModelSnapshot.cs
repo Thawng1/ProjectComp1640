@@ -198,7 +198,7 @@ namespace ProjectComp1640.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Admins");
+                    b.ToTable("Admins", (string)null);
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.AppUser", b =>
@@ -300,7 +300,7 @@ namespace ProjectComp1640.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Blogs");
+                    b.ToTable("Blogs", (string)null);
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Class", b =>
@@ -342,7 +342,7 @@ namespace ProjectComp1640.Migrations
 
                     b.HasIndex("TutorId");
 
-                    b.ToTable("Classes");
+                    b.ToTable("Classes", (string)null);
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.ClassStudent", b =>
@@ -357,7 +357,7 @@ namespace ProjectComp1640.Migrations
 
                     b.HasIndex("ClassId");
 
-                    b.ToTable("ClassStudents");
+                    b.ToTable("ClassStudents", (string)null);
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Classroom", b =>
@@ -374,7 +374,7 @@ namespace ProjectComp1640.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Classrooms");
+                    b.ToTable("Classrooms", (string)null);
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Messages", b =>
@@ -406,7 +406,7 @@ namespace ProjectComp1640.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Schedule", b =>
@@ -439,7 +439,7 @@ namespace ProjectComp1640.Migrations
 
                     b.HasIndex("ClassroomId");
 
-                    b.ToTable("Schedules");
+                    b.ToTable("Schedules", (string)null);
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Student", b =>
@@ -473,7 +473,7 @@ namespace ProjectComp1640.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Students");
+                    b.ToTable("Students", (string)null);
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Subject", b =>
@@ -495,7 +495,7 @@ namespace ProjectComp1640.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subjects");
+                    b.ToTable("Subjects", (string)null);
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Tutor", b =>
@@ -527,7 +527,7 @@ namespace ProjectComp1640.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Tutors");
+                    b.ToTable("Tutors", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
