@@ -12,8 +12,6 @@ namespace ProjectComp1640.Model
         public int TotalSlot { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        //classroom can be created as a difference entities, and check condition of class schedule based on day and slot
-        //or create a new classroom attribute
         public int? TutorId { get; set; }
         public virtual Tutor? Tutor { get; set; }
         public int? SubjectId { get; set; }
