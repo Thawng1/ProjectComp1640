@@ -63,23 +63,23 @@ namespace ProjectComp1640.Controllers
         }
 
         [HttpGet("get-all-classes")]
-        public async Task<ActionResult<IEnumerable<CreateClassDto>>> GetClasses()
+        public async Task<ActionResult<IEnumerable<CreateClassDto>>> GetAllClasses()
         {
             var classes = await _context.Classes
+                .Include(c => c.Tutor).ThenInclude(t => t.User)
                 .Include(c => c.Subject)
-                .Include(c => c.Tutor.User)
-                .Include(c => c.ClassStudents).ThenInclude(cs => cs.Student.User)
+                .Include(c => c.ClassStudents).ThenInclude(cs => cs.Student).ThenInclude(s => s.User)
                 .ToListAsync();
             var classDTOs = classes.Select(c => new CreateClassDto
             {
-                TutorName = c.Tutor.User.FullName,
-                SubjectName = c.Subject.SubjectName,
+                TutorName = c.Tutor?.User?.FullName ?? "No Tutor",
+                SubjectName = c.Subject?.SubjectName ?? "No Subject",
                 ClassName = c.ClassName,
-                TotalSlot = c.TotalSlot, 
-                StartDate = c.StartDate, 
+                TotalSlot = c.TotalSlot,
+                StartDate = c.StartDate,
                 EndDate = c.EndDate,
                 Description = c.Description,
-                StudentNames = c.ClassStudents.Select(cs => cs.Student.User.FullName).ToList()
+                StudentNames = c.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.User.FullName).ToList()
             }).ToList();
             return Ok(classDTOs);
         }
