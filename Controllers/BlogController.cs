@@ -59,7 +59,7 @@ namespace ProjectComp1640.Controllers
 
             _context.Blogs.Add(blog);
             await _context.SaveChangesAsync();
-            return Ok(new { message = "Blog created successfully, pending approval." });
+            return Ok(new { message = "Blog created successfully." });
         }
         [Authorize(Roles = "Admin")]
         [HttpGet("all")]
@@ -70,13 +70,38 @@ namespace ProjectComp1640.Controllers
                 .Select(b => new
                 {
                     b.Id,
+                    b.Title,  
+                    b.Content,
+                    b.Url,
+                    b.CreatedAt,
+                    User = b.User.FullName,
+                }).ToListAsync();
+            return Ok(blogs);
+        }
+        [Authorize]
+        [HttpGet("/{id}")]
+        public async Task<IActionResult> GetBlogsById(int id)
+        {
+            var blog = await _context.Blogs
+                .Where(b => b.Id == id)
+                .Include(b => b.User)
+                .Select(b => new
+                {
+                    b.Id,
                     b.Title,
                     b.Content,
                     b.Url,
                     b.CreatedAt,
-                    User = b.User.UserName,
-                }).ToListAsync();
-            return Ok(blogs);
+                    User = b.User != null ? b.User.FullName : "Unknown User"
+                })
+                .FirstOrDefaultAsync();
+
+            if (blog == null)
+            {
+                return BadRequest("No blog");
+            }
+
+            return Ok(blog);
         }
 
         // -------------------------- UPDATE BLOG --------------------------
@@ -117,10 +142,12 @@ namespace ProjectComp1640.Controllers
         public async Task<IActionResult> DeleteBlog(int id)
         {
             var blog = await _context.Blogs.FindAsync(id);
-            if (blog == null) return NotFound();
+            if (blog == null) 
+                return NotFound();
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (blog.UserId != userId && !(User.IsInRole("Admin"))) return Forbid();
+            if (blog.UserId != userId && !(User.IsInRole("Admin"))) 
+                return Forbid();
 
             _context.Blogs.Remove(blog);
             await _context.SaveChangesAsync();

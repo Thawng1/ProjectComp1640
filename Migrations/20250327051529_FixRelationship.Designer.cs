@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectComp1640.Data;
 
@@ -11,9 +12,11 @@ using ProjectComp1640.Data;
 namespace ProjectComp1640.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250327051529_FixRelationship")]
+    partial class FixRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,31 +54,19 @@ namespace ProjectComp1640.Migrations
                     b.HasData(
                         new
                         {
-<<<<<<< HEAD
-                            Id = "02d765df-218f-43c4-8fec-324bfb859378",
-=======
                             Id = "750eb95f-fee8-4475-bb72-641ad785d4f9",
->>>>>>> main
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-<<<<<<< HEAD
-                            Id = "e9230841-f3f7-4d8e-b47c-78896099b137",
-=======
                             Id = "0c542ffd-2f67-42f1-8ba0-40b30270da4e",
->>>>>>> main
                             Name = "Tutor",
                             NormalizedName = "TUTOR"
                         },
                         new
                         {
-<<<<<<< HEAD
-                            Id = "f0993d5f-e9ec-49f2-91df-da4b9459ce4b",
-=======
                             Id = "9f1bda12-ec7f-443b-b483-83fee7ddcfe5",
->>>>>>> main
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });
@@ -389,40 +380,6 @@ namespace ProjectComp1640.Migrations
                     b.ToTable("Classrooms");
                 });
 
-            modelBuilder.Entity("ProjectComp1640.Model.Comment", b =>
-                {
-                    b.Property<int?>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"));
-
-                    b.Property<string>("AppUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("BlogId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CommentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId");
-
-                    b.HasIndex("BlogId");
-
-                    b.ToTable("Comments");
-                });
-
             modelBuilder.Entity("ProjectComp1640.Model.Messages", b =>
                 {
                     b.Property<int>("Id")
@@ -687,23 +644,6 @@ namespace ProjectComp1640.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("ProjectComp1640.Model.Comment", b =>
-                {
-                    b.HasOne("ProjectComp1640.Model.AppUser", "AppUser")
-                        .WithMany()
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectComp1640.Model.Blog", "Blog")
-                        .WithMany("Comments")
-                        .HasForeignKey("BlogId");
-
-                    b.Navigation("AppUser");
-
-                    b.Navigation("Blog");
-                });
-
             modelBuilder.Entity("ProjectComp1640.Model.Messages", b =>
                 {
                     b.HasOne("ProjectComp1640.Model.AppUser", "Receiver")
@@ -762,11 +702,6 @@ namespace ProjectComp1640.Migrations
                     b.Navigation("User");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("ProjectComp1640.Model.Blog", b =>
-                {
-                    b.Navigation("Comments");
-=======
             modelBuilder.Entity("ProjectComp1640.Model.AppUser", b =>
                 {
                     b.Navigation("Blogs");
@@ -776,7 +711,6 @@ namespace ProjectComp1640.Migrations
 
                     b.Navigation("Tutors")
                         .IsRequired();
->>>>>>> main
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Class", b =>
