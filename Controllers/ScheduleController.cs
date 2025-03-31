@@ -28,6 +28,7 @@ namespace ProjectComp1640.Controllers
             {
                 Day = s.Day,
                 Slot = s.Slot,
+                LinkMeeting = s.LinkMeeting,
                 ClassId = s.ClassId,
                 ClassroomId = s.ClassroomId,
             });
@@ -49,6 +50,7 @@ namespace ProjectComp1640.Controllers
             {
                 Day = s.Day,
                 Slot = s.Slot,
+                LinkMeeting = s.LinkMeeting,
                 ClassId = s.ClassId,
                 ClassroomId = s.ClassroomId,
             };
@@ -86,6 +88,7 @@ namespace ProjectComp1640.Controllers
                 ScheduleDate = current,
                 Day = scheduleDto.Day,
                 Slot = scheduleDto.Slot,
+                LinkMeeting = scheduleDto.LinkMeeting,
                 ClassId = scheduleDto.ClassId,
                 ClassroomId = scheduleDto.ClassroomId
             };
@@ -115,6 +118,7 @@ namespace ProjectComp1640.Controllers
                     ScheduleDate = current,
                     Day = scheduleDto.Day,
                     Slot = scheduleDto.Slot,
+                    LinkMeeting = scheduleDto.LinkMeeting,
                     ClassId = scheduleDto.ClassId,
                     ClassroomId = scheduleDto.ClassroomId
                 });
@@ -128,6 +132,7 @@ namespace ProjectComp1640.Controllers
                 s.ScheduleDate,
                 s.Day,
                 s.Slot,
+                s.LinkMeeting,
                 s.ClassId,
                 s.ClassroomId
             }));
