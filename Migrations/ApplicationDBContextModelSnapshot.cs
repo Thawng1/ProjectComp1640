@@ -51,31 +51,25 @@ namespace ProjectComp1640.Migrations
                     b.HasData(
                         new
                         {
-<<<<<<< HEAD
+
                             Id = "02d765df-218f-43c4-8fec-324bfb859378",
-=======
-                            Id = "750eb95f-fee8-4475-bb72-641ad785d4f9",
->>>>>>> main
+
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-<<<<<<< HEAD
+
                             Id = "e9230841-f3f7-4d8e-b47c-78896099b137",
-=======
-                            Id = "0c542ffd-2f67-42f1-8ba0-40b30270da4e",
->>>>>>> main
+
                             Name = "Tutor",
                             NormalizedName = "TUTOR"
                         },
                         new
                         {
-<<<<<<< HEAD
+
                             Id = "f0993d5f-e9ec-49f2-91df-da4b9459ce4b",
-=======
-                            Id = "9f1bda12-ec7f-443b-b483-83fee7ddcfe5",
->>>>>>> main
+
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });
@@ -762,22 +756,22 @@ namespace ProjectComp1640.Migrations
                     b.Navigation("User");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("ProjectComp1640.Model.Blog", b =>
-                {
-                    b.Navigation("Comments");
-=======
+            {
+                b.Navigation("Comments");
+            });
+
             modelBuilder.Entity("ProjectComp1640.Model.AppUser", b =>
-                {
-                    b.Navigation("Blogs");
+            {
+                b.Navigation("Blogs");
 
-                    b.Navigation("Students")
-                        .IsRequired();
+                b.Navigation("Students")
+                    .IsRequired();
 
-                    b.Navigation("Tutors")
-                        .IsRequired();
->>>>>>> main
-                });
+                b.Navigation("Tutors")
+                    .IsRequired();
+            });
+
 
             modelBuilder.Entity("ProjectComp1640.Model.Class", b =>
                 {
