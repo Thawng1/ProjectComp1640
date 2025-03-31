@@ -31,6 +31,14 @@ namespace ProjectComp1640.Controllers
                 return NotFound($"Cannot found subject with name '{createClassDto.SubjectName}'");
             }
             var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Id == subjectName.Id);
+            if (createClassDto.EndDate < createClassDto.StartDate)
+            {
+                return BadRequest("End date cannot be earlier than start date.");
+            }
+            if(createClassDto.TotalSlot <= 0)
+            {
+                return BadRequest("Number of total slots must be greater than 0.");
+            }
             var classStudents = new List<ClassStudent>();
             foreach (var studentName in createClassDto.StudentNames)
             {
@@ -145,6 +153,14 @@ namespace ProjectComp1640.Controllers
                 }
                 var tutor = await _context.Tutors.FirstOrDefaultAsync(t => t.UserId == tutorUser.Id);
                 cls.TutorId = tutor.Id;
+            }
+            if (createClassDto.EndDate < createClassDto.StartDate)
+            {
+                return BadRequest("End date cannot be earlier than start date.");
+            }
+            if (createClassDto.TotalSlot <= 0)
+            {
+                return BadRequest("Number of total slots must be greater than 0.");
             }
             var newClassStudents = new List<ClassStudent>();
             foreach (var studentName in createClassDto.StudentNames)

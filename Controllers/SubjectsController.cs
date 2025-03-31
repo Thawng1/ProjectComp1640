@@ -18,7 +18,7 @@ namespace ProjectComp1640.Controllers
         {
             _context = context;
         }
-        [HttpGet]
+        [HttpGet("get-all-subjects")]
         public async Task<ActionResult<IEnumerable<Subject>>> GetAllSubjects()
         {
             var subjects = await _context.Subjects
@@ -42,7 +42,7 @@ namespace ProjectComp1640.Controllers
             }).ToList();
             return Ok(subjectDtos);
         }
-        [HttpGet("{id}")]
+        [HttpGet("get-subject/{id}")]
         public async Task<ActionResult<SubjectDto>> GetSubject(int id)
         {
             var subject = await _context.Subjects
@@ -70,7 +70,7 @@ namespace ProjectComp1640.Controllers
             };
             return Ok(subjectDto);
         }
-        [HttpPost]
+        [HttpPost("create-subject")]
         public async Task<ActionResult<Subject>> CreateSubject(SubjectDto subjectDto)
         {
             var newSubject = new Subject
@@ -82,7 +82,7 @@ namespace ProjectComp1640.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetSubject), new { id = newSubject.Id }, new { message = "Subject created successfully.", subjectDto });
         }
-        [HttpPut("{id}")]
+        [HttpPut("update-subject/{id}")]
         public async Task<IActionResult> UpdateSubject(int id, SubjectDto subjectDto)
         {
             var sbj = await _context.Subjects.FirstOrDefaultAsync(s => s.Id == id);
@@ -105,7 +105,7 @@ namespace ProjectComp1640.Controllers
             }
             return Ok(new { message = "Subject updated successfully." });
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("delete-subject/{id}")]
         public async Task<IActionResult> DeleteSubject(int id)
         {
             var subject = await _context.Subjects.FindAsync(id);
