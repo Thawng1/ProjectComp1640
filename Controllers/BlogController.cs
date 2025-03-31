@@ -61,7 +61,7 @@ namespace ProjectComp1640.Controllers
             await _context.SaveChangesAsync();
             return Ok(new { message = "Blog created successfully." });
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet("all")]
         public async Task<IActionResult> GetAllBlogs()
         {
