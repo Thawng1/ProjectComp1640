@@ -88,7 +88,8 @@ namespace ProjectComp1640.Controllers
                 StartDate = c.StartDate,
                 EndDate = c.EndDate,
                 Description = c.Description,
-                StudentNames = c.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.User.FullName).ToList()
+                StudentNames = c.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.User.FullName).ToList(),
+                StudentIds = c.ClassStudents.Where(cs => cs.Student?.User !=null).Select(cs => cs.Student.Id).ToList()
             }).ToList();
             return Ok(classDTOs);
         }

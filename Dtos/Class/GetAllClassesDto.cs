@@ -11,5 +11,6 @@
         public DateTime EndDate { get; set; }
         public string Description { get; set; }
         public List<string> StudentNames { get; set; } = new List<string>();
+        public List<int> StudentIds { get; set; } = new List<int>();
     }
 }
