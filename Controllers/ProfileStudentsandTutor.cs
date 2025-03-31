@@ -39,26 +39,17 @@ namespace ProjectComp1640.Controllers
             }
             return BadRequest("Student not found");
         }
-        [Authorize(Roles = "Student,Admin")] // 👈 Cho phép cả Admin và Student truy cập
+        [Authorize] 
         [HttpGet("students/{id}")]
         public async Task<IActionResult> GetStudentById(int id)
         {
             // Lấy userId từ token
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
-
-            // Kiểm tra nếu user có quyền Admin
-            var isAdmin = User.IsInRole("Admin");
-
             // Truy vấn sinh viên theo ID
             var studentQuery = _context.Students
                 .Include(s => s.User)
                 .Where(s => s.Id == id);
-
-            if (!isAdmin) // Nếu không phải Admin, kiểm tra UserId
-            {
-                studentQuery = studentQuery.Where(s => s.UserId == userId);
-            }
 
             var student = await studentQuery
                 .Select(s => new
@@ -85,7 +76,7 @@ namespace ProjectComp1640.Controllers
         }
 
 
-        [Authorize]
+        [Authorize( Roles = "Admin")]
         [HttpGet("tutors")]
         public async Task<IActionResult> GetTutors()
         {
@@ -108,25 +99,20 @@ namespace ProjectComp1640.Controllers
 
           
         }
-        [Authorize(Roles = "Tutor,Admin")] // 👈 Cho phép cả Admin và Tutor truy cập
+        [Authorize] // 👈 Cho phép cả Admin và Tutor truy cập
         [HttpGet("tutors/{id}")]
         public async Task<IActionResult> GetTutorById(int id)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
 
-            // Kiểm tra nếu user có quyền Admin
-            var isAdmin = User.IsInRole("Admin");
-
+            
             // Truy vấn giảng viên theo ID
             var tutorQuery = _context.Tutors
                 .Include(t => t.User)
                 .Where(t => t.Id == id);
 
-            if (!isAdmin) // Nếu không phải Admin, chỉ lấy tutor của chính mình
-            {
-                tutorQuery = tutorQuery.Where(t => t.UserId == userId);
-            }
+           
 
             var tutor = await tutorQuery
                 .Select(t => new
