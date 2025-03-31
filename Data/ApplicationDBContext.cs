@@ -71,11 +71,26 @@ namespace ProjectComp1640.Data
                 .HasForeignKey(clr => clr.ClassroomId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
-            builder.Entity<Blog>()
-               .HasOne(b => b.User)
-               .WithMany()
-               .HasForeignKey(b => b.UserId)
-               .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<AppUser>()
+                 .HasOne(a => a.Students)
+                 .WithOne(s => s.User)
+                 .HasForeignKey<Student>(s => s.UserId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                    // Quan hệ 1-1 giữa AppUser và Tutor
+            builder.Entity<AppUser>()
+                .HasOne(a => a.Tutors)
+                .WithOne(t => t.User)
+                .HasForeignKey<Tutor>(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Quan hệ 1-N giữa AppUser và Blog
+            builder.Entity<AppUser>()
+                .HasMany(a => a.Blogs)
+                .WithOne(b => b.User)
+                .HasForeignKey(b => b.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             List<IdentityRole> roles = new List<IdentityRole>
             {

@@ -26,7 +26,7 @@ namespace ProjectComp1640.Controllers
         }
 
         // -------------------------- CREATE --------------------------
-        [Authorize]
+        [Authorize (Roles = "Student,Tutor")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateBlog([FromForm] BlogDto dto)
         {
@@ -79,7 +79,7 @@ namespace ProjectComp1640.Controllers
             return Ok(blogs);
         }
         [Authorize]
-        [HttpGet("/{id}")]
+        [HttpGet("blog/{id}")]
         public async Task<IActionResult> GetBlogsById(int id)
         {
             var blog = await _context.Blogs
