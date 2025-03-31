@@ -45,6 +45,7 @@ builder.Services.AddSwaggerGen(option =>
 });
 
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<IComment, CommentService>();
 
 // Kết nối Database
 builder.Services.AddDbContext<ApplicationDBContext>(options =>

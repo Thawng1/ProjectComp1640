@@ -9,5 +9,7 @@
         public string Content { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public virtual AppUser User { get; set; }
+
+        public List<Comment> Comments { get; set; } = new List<Comment>();
     }
 }

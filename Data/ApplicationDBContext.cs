@@ -22,6 +22,7 @@ namespace ProjectComp1640.Data
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<Classroom> Classrooms { get; set; }
         public DbSet<Blog> Blogs { get; set; }
+        public DbSet<Comment> Comments { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
