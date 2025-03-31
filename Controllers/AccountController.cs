@@ -7,6 +7,7 @@ using ProjectComp1640.Dtos.Account;
 using ProjectComp1640.Interfaces;
 using ProjectComp1640.Model;
 using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ProjectComp1640.Controllers
@@ -69,6 +70,9 @@ namespace ProjectComp1640.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            // 🔥 Kiểm tra định dạng email hợp lệ
+            if (!Regex.IsMatch(registerDto.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                return BadRequest("Invalid email format.");
             // Kiểm tra username & email đã tồn tại chưa
             if (await _userManager.FindByNameAsync(registerDto.Username) != null)
                 return BadRequest("Username is already taken.");
@@ -123,7 +127,9 @@ namespace ProjectComp1640.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
+            // 🔥 Kiểm tra định dạng email hợp lệ
+            if (!Regex.IsMatch(registerDto.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                return BadRequest("Invalid email format.");
             // Kiểm tra username & email đã tồn tại chưa
             if (await _userManager.FindByNameAsync(registerDto.Username) != null)
                 return BadRequest("Username is already taken.");

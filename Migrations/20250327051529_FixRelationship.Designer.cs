@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectComp1640.Data;
 
@@ -11,9 +12,11 @@ using ProjectComp1640.Data;
 namespace ProjectComp1640.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250327051529_FixRelationship")]
+    partial class FixRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,19 +54,19 @@ namespace ProjectComp1640.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "2e5b31b9-c5d3-4d21-aaff-993bfbc47a0c",
+                            Id = "750eb95f-fee8-4475-bb72-641ad785d4f9",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "ef4d9ac4-2437-4d5c-a7e3-7b3f436c603b",
+                            Id = "0c542ffd-2f67-42f1-8ba0-40b30270da4e",
                             Name = "Tutor",
                             NormalizedName = "TUTOR"
                         },
                         new
                         {
-                            Id = "5abe1365-216b-494b-8286-6195d809ad33",
+                            Id = "9f1bda12-ec7f-443b-b483-83fee7ddcfe5",
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });
@@ -289,6 +292,7 @@ namespace ProjectComp1640.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Url")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")

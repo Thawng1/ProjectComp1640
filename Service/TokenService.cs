@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProjectComp1640.Interfaces;
 using ProjectComp1640.Model;
@@ -36,6 +37,35 @@ namespace ProjectComp1640.Service
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role)); // 👈 Đảm bảo role được thêm vào token
+            }
+            // 🔎 Nếu user có role "Student", lấy StudentId
+            if (roles.Contains("Student"))
+            {
+                var student = await _userManager.Users
+                    .Include(u => u.Students) // Thêm Include để load dữ liệu
+                    .Where(u => u.Id == user.Id)
+                    .Select(u => u.Students) // Lấy student đầu tiên nếu có
+                    .FirstOrDefaultAsync();
+
+                if (student != null)
+                {
+                    claims.Add(new Claim("StudentId", student.Id.ToString()));
+                }
+            }
+
+            // 🔎 Nếu user có role "Tutor", lấy TutorId
+            if (roles.Contains("Tutor"))
+            {
+                var tutor = await _userManager.Users
+                    .Include(u => u.Tutors) // Thêm Include để load dữ liệu
+                    .Where(u => u.Id == user.Id)
+                    .Select(u => u.Tutors)
+                    .FirstOrDefaultAsync();
+
+                if (tutor != null)
+                {
+                    claims.Add(new Claim("TutorId", tutor.Id.ToString()));
+                }
             }
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);

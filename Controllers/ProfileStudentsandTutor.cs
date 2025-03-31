@@ -17,7 +17,7 @@ namespace ProjectComp1640.Controllers
             _context = context;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet("students")]
         public async Task<IActionResult> GetStudents()
         {
@@ -39,18 +39,19 @@ namespace ProjectComp1640.Controllers
             }
             return BadRequest("Student not found");
         }
-        [Authorize(Roles = "Student")]
+        [Authorize] 
         [HttpGet("students/{id}")]
         public async Task<IActionResult> GetStudentById(int id)
         {
             // Lấy userId từ token
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
-
-            // Tìm sinh viên theo id và kiểm tra UserId có khớp với user đang đăng nhập không
-            var student = await _context.Students
+            // Truy vấn sinh viên theo ID
+            var studentQuery = _context.Students
                 .Include(s => s.User)
-                .Where(s => s.Id == id && s.UserId == userId)
+                .Where(s => s.Id == id);
+
+            var student = await studentQuery
                 .Select(s => new
                 {
                     s.Id,
@@ -68,14 +69,14 @@ namespace ProjectComp1640.Controllers
 
             if (student == null)
             {
-                return Forbid(); // Không được phép nếu cố xem thông tin người khác
+                return Forbid(); // Không có quyền xem thông tin
             }
 
             return Ok(student);
         }
 
 
-        [Authorize(Roles = "Admin")]
+        [Authorize( Roles = "Admin")]
         [HttpGet("tutors")]
         public async Task<IActionResult> GetTutors()
         {
@@ -98,16 +99,22 @@ namespace ProjectComp1640.Controllers
 
           
         }
-        [Authorize(Roles = "Tutor")]
+        [Authorize] // 👈 Cho phép cả Admin và Tutor truy cập
         [HttpGet("tutors/{id}")]
         public async Task<IActionResult> GetTutorById(int id)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
 
-            var tutor = await _context.Tutors
+            
+            // Truy vấn giảng viên theo ID
+            var tutorQuery = _context.Tutors
                 .Include(t => t.User)
-                .Where(t => t.Id == id && t.UserId == userId)
+                .Where(t => t.Id == id);
+
+           
+
+            var tutor = await tutorQuery
                 .Select(t => new
                 {
                     t.Id,
@@ -125,7 +132,7 @@ namespace ProjectComp1640.Controllers
 
             if (tutor == null)
             {
-                return Forbid(); // Không cho phép nếu không phải chính giảng viên đó
+                return Forbid(); // Không có quyền xem thông tin
             }
 
             return Ok(tutor);
