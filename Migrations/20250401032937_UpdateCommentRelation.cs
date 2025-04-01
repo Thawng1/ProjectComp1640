@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -7,7 +8,7 @@
 namespace ProjectComp1640.Migrations
 {
     /// <inheritdoc />
-    public partial class FixRelationship : Migration
+    public partial class UpdateCommentRelation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,14 +36,42 @@ namespace ProjectComp1640.Migrations
                 keyColumn: "Id",
                 keyValue: "f135d96c-1926-40d3-a358-691edddd0233");
 
+            migrationBuilder.CreateTable(
+                name: "Comments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    BlogId = table.Column<int>(type: "int", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Comments_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Comments_Blogs_BlogId",
+                        column: x => x.BlogId,
+                        principalTable: "Blogs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "0c542ffd-2f67-42f1-8ba0-40b30270da4e", null, "Tutor", "TUTOR" },
-                    { "750eb95f-fee8-4475-bb72-641ad785d4f9", null, "Admin", "ADMIN" },
-                    { "9f1bda12-ec7f-443b-b483-83fee7ddcfe5", null, "Student", "STUDENT" }
+                    { "3585a580-d3a5-4d06-8d9d-fdda76f914cf", null, "Student", "STUDENT" },
+                    { "4dd5d9ec-ac1a-4bde-9e80-926ab215a9cb", null, "Tutor", "TUTOR" },
+                    { "e3a1d172-26e5-4ff2-8d7f-d73368b4d48b", null, "Admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -56,11 +85,24 @@ namespace ProjectComp1640.Migrations
                 table: "Students",
                 column: "UserId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_BlogId",
+                table: "Comments",
+                column: "BlogId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_UserId",
+                table: "Comments",
+                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Comments");
+
             migrationBuilder.DropIndex(
                 name: "IX_Tutors_UserId",
                 table: "Tutors");
@@ -72,17 +114,17 @@ namespace ProjectComp1640.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "0c542ffd-2f67-42f1-8ba0-40b30270da4e");
+                keyValue: "3585a580-d3a5-4d06-8d9d-fdda76f914cf");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "750eb95f-fee8-4475-bb72-641ad785d4f9");
+                keyValue: "4dd5d9ec-ac1a-4bde-9e80-926ab215a9cb");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "9f1bda12-ec7f-443b-b483-83fee7ddcfe5");
+                keyValue: "e3a1d172-26e5-4ff2-8d7f-d73368b4d48b");
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",

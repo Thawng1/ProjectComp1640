@@ -51,25 +51,19 @@ namespace ProjectComp1640.Migrations
                     b.HasData(
                         new
                         {
-
-                            Id = "02d765df-218f-43c4-8fec-324bfb859378",
-
+                            Id = "e3a1d172-26e5-4ff2-8d7f-d73368b4d48b",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-
-                            Id = "e9230841-f3f7-4d8e-b47c-78896099b137",
-
+                            Id = "4dd5d9ec-ac1a-4bde-9e80-926ab215a9cb",
                             Name = "Tutor",
                             NormalizedName = "TUTOR"
                         },
                         new
                         {
-
-                            Id = "f0993d5f-e9ec-49f2-91df-da4b9459ce4b",
-
+                            Id = "3585a580-d3a5-4d06-8d9d-fdda76f914cf",
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         });
@@ -385,20 +379,13 @@ namespace ProjectComp1640.Migrations
 
             modelBuilder.Entity("ProjectComp1640.Model.Comment", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"));
-
-                    b.Property<string>("AppUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("BlogId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CommentId")
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
@@ -408,11 +395,15 @@ namespace ProjectComp1640.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
-
                     b.HasIndex("BlogId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Comments");
                 });
@@ -683,19 +674,20 @@ namespace ProjectComp1640.Migrations
 
             modelBuilder.Entity("ProjectComp1640.Model.Comment", b =>
                 {
-                    b.HasOne("ProjectComp1640.Model.AppUser", "AppUser")
-                        .WithMany()
-                        .HasForeignKey("AppUserId")
+                    b.HasOne("ProjectComp1640.Model.Blog", "Blog")
+                        .WithMany("Comments")
+                        .HasForeignKey("BlogId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ProjectComp1640.Model.AppUser", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjectComp1640.Model.Blog", "Blog")
-                        .WithMany("Comments")
-                        .HasForeignKey("BlogId");
-
-                    b.Navigation("AppUser");
-
                     b.Navigation("Blog");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Messages", b =>
@@ -756,22 +748,23 @@ namespace ProjectComp1640.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ProjectComp1640.Model.Blog", b =>
-            {
-                b.Navigation("Comments");
-            });
-
             modelBuilder.Entity("ProjectComp1640.Model.AppUser", b =>
-            {
-                b.Navigation("Blogs");
+                {
+                    b.Navigation("Blogs");
 
-                b.Navigation("Students")
-                    .IsRequired();
+                    b.Navigation("Comments");
 
-                b.Navigation("Tutors")
-                    .IsRequired();
-            });
+                    b.Navigation("Students")
+                        .IsRequired();
 
+                    b.Navigation("Tutors")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProjectComp1640.Model.Blog", b =>
+                {
+                    b.Navigation("Comments");
+                });
 
             modelBuilder.Entity("ProjectComp1640.Model.Class", b =>
                 {

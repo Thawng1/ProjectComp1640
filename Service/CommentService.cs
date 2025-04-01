@@ -12,14 +12,15 @@ namespace ProjectComp1640.Service
         { 
             _context = context;
         }
-        public Task<Comment> CreateAsync(Comment commentModel)
+        public async Task CreateAsync(Comment comment)
         {
-            throw new NotImplementedException();
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync();
         }
-
-        public Task<Comment?> DeleteAsync(int id)
+        public async Task DeleteAsync(Comment comment)
         {
-            throw new NotImplementedException();
+            _context.Comments.Remove(comment);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<List<Comment>> GetAllAsync()
@@ -27,14 +28,35 @@ namespace ProjectComp1640.Service
             return await _context.Comments.ToListAsync();
         }
 
-        public Task<Comment?> GetByIdAsync(int id)
+        public async Task<IEnumerable<Comment>> GetByBlogIdAsync(int blogId)
         {
-            throw new NotImplementedException();
+            return await _context.Comments
+                .Where(c => c.BlogId == blogId)
+                .Include(c => c.User)
+                .ToListAsync();
         }
 
-        public Task<Comment?> UpdateAsync(int id, Comment commentModel)
+        public async Task<Comment?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Comments
+                .Include(c => c.User)
+                .FirstOrDefaultAsync(c => c.Id == id);
+        }
+
+        public async Task<Comment?> UpdateAsync(int id, Comment commentModel)
+        {
+            var existingComment = await _context.Comments.FindAsync(id);
+            if (existingComment == null)
+            {
+                return null; // Comment không tồn tại
+            }
+
+            // Cập nhật dữ liệu
+            existingComment.Content = commentModel.Content;
+
+            _context.Comments.Update(existingComment);
+            await _context.SaveChangesAsync();
+            return existingComment;
         }
     }
 }

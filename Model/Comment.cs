@@ -4,14 +4,12 @@ namespace ProjectComp1640.Model
 {
     public class Comment
     {
-        public int CommentId { get; set; }
+        public int Id { get; set; }
         public string Content { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.Now;
-        
-        
-        public int? Id { get; set; }
+        public int? BlogId { get; set; }
         public Blog? Blog { get; set; }
-        public string AppUserId { get; set; }
-        public AppUser AppUser { get; set; }
+        public string UserId { get; set; }   
+        public AppUser User { get; set; }
     }
 }

@@ -43,6 +43,10 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+});
 
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<IComment, CommentService>();

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProjectComp1640.Model;
+using System.Reflection.Emit;
 
 namespace ProjectComp1640.Data
 {
@@ -26,6 +27,18 @@ namespace ProjectComp1640.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.Entity<Comment>()
+               .HasOne(c => c.User)
+               .WithMany(b => b.Comments)
+               .HasForeignKey(c => c.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
+            // Quan hệ giữa Blog và Comment
+            builder.Entity<Comment>()
+                .HasOne(c => c.Blog)
+                .WithMany(b => b.Comments)
+                .HasForeignKey(c => c.BlogId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<Messages>()
                 .HasOne(m => m.Sender)
                 .WithMany()

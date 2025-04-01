@@ -4,11 +4,12 @@ namespace ProjectComp1640.Dtos.Comment
 {
     public class CommentDto
     {
-        public int CommentId { get; set; }
+        public int Id { get; set; }
         public string Content { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.Now;
-        public int? Id { get; set; }
-     
-     
+      //public int? BlogId { get; set; }
+        public string UserFullName { get; set; }
+
+
     }
 }
