@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectComp1640.Data;
-using ProjectComp1640.Dtos.Other;
+using ProjectComp1640.Dtos.Schedule;
 using ProjectComp1640.Model;
 
 namespace ProjectComp1640.Controllers
@@ -17,7 +17,7 @@ namespace ProjectComp1640.Controllers
             _dbContext = dbContext;
         }
         // GET: api/Schedule
-        [HttpGet]
+        [HttpGet("get-all-schedules")]
         public async Task<ActionResult<IEnumerable<ScheduleDto>>> GetSchedules()
         {
             var schedules = await _dbContext.Schedules
@@ -35,7 +35,7 @@ namespace ProjectComp1640.Controllers
             return Ok(scheduleList);
         }
         // GET: api/Schedule/5
-        [HttpGet("{id}")]
+        [HttpGet("get-schedule/{id}")]
         public async Task<ActionResult<ScheduleDto>> GetSchedule(int id)
         {
             var s = await _dbContext.Schedules
@@ -57,7 +57,7 @@ namespace ProjectComp1640.Controllers
             return Ok(dto);
         }
         // DELETE: api/Schedule/5
-        [HttpDelete("{id}")]
+        [HttpDelete("delete-schedule/{id}")]
         public async Task<IActionResult> DeleteSchedule(int id)
         {
             var schedule = await _dbContext.Schedules.FindAsync(id);
@@ -70,7 +70,7 @@ namespace ProjectComp1640.Controllers
 
             return NoContent();
         }
-        [HttpPost()]
+        [HttpPost("create-schedule")]
         public async Task<IActionResult> CreateSchedule(ScheduleDto scheduleDto)
         {
             var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
