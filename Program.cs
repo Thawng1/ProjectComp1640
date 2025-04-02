@@ -7,6 +7,7 @@ using ProjectComp1640.Chat;
 using ProjectComp1640.Data;
 using ProjectComp1640.Interfaces;
 using ProjectComp1640.Model;
+using ProjectComp1640.NotificationConnect;
 using ProjectComp1640.Service;
 using System.Text;
 
@@ -15,6 +16,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<MessageService>();
+builder.Services.AddScoped<NotificationService>();
 
 builder.Services.AddSwaggerGen(option =>
 {
@@ -158,6 +160,11 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
     endpoints.MapHub<MessageHub>("/MessageHub");  // **Thêm SignalR Hub**
+});
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/notificationHub"); // Định tuyến hub riêng
 });
 app.MapControllers();
 app.Run();
