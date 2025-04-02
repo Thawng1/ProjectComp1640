@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectComp1640.Data;
-using ProjectComp1640.Dtos.Other;
+using ProjectComp1640.Dtos.Schedule;
 using ProjectComp1640.Model;
 
 namespace ProjectComp1640.Controllers
@@ -17,7 +17,7 @@ namespace ProjectComp1640.Controllers
             _dbContext = dbContext;
         }
         // GET: api/Schedule
-        [HttpGet]
+        [HttpGet("get-all-schedules")]
         public async Task<ActionResult<IEnumerable<ScheduleDto>>> GetSchedules()
         {
             var schedules = await _dbContext.Schedules
@@ -35,7 +35,7 @@ namespace ProjectComp1640.Controllers
             return Ok(scheduleList);
         }
         // GET: api/Schedule/5
-        [HttpGet("{id}")]
+        [HttpGet("get-schedule/{id}")]
         public async Task<ActionResult<ScheduleDto>> GetSchedule(int id)
         {
             var s = await _dbContext.Schedules
@@ -56,27 +56,13 @@ namespace ProjectComp1640.Controllers
             };
             return Ok(dto);
         }
-        // DELETE: api/Schedule/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSchedule(int id)
-        {
-            var schedule = await _dbContext.Schedules.FindAsync(id);
-            if (schedule == null)
-            { 
-                return NotFound();
-            }
-            _dbContext.Schedules.Remove(schedule);
-            await _dbContext.SaveChangesAsync();
-
-            return NoContent();
-        }
-        [HttpPost()]
+        [HttpPost("create-schedule")]
         public async Task<IActionResult> CreateSchedule(ScheduleDto scheduleDto)
         {
             var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
             if (cls == null)
             {
-                return NotFound("Class not found");
+                return NotFound("Không tìm thấy Lớp học");
             }
             var current = cls.StartDate;
             while (current.DayOfWeek != scheduleDto.Day)
@@ -95,6 +81,39 @@ namespace ProjectComp1640.Controllers
             _dbContext.Schedules.Add(schedule);
             await _dbContext.SaveChangesAsync();
             return CreatedAtAction(nameof(GetSchedule), new { id = schedule.Id }, scheduleDto);
+        }
+        [HttpPut("update-schedule/{id}")]
+        public async Task<IActionResult> UpdateSchedule(int id, ScheduleDto scheduleDto)
+        {
+            var schedule = await _dbContext.Schedules.FindAsync(id);
+            if (schedule == null)
+            {
+                return NotFound("Không tìm thấy lịch học này");
+            }
+            var cls = await _dbContext.Classes.FindAsync(id);
+            if (cls == null) {
+                return NotFound("Không tìm thấy Lớp học");
+            }
+            schedule.Day = scheduleDto.Day;
+            schedule.Slot = scheduleDto.Slot;
+            schedule.LinkMeeting = scheduleDto.LinkMeeting;
+            schedule.ClassId = scheduleDto.ClassId;
+            schedule.ClassroomId = scheduleDto.ClassroomId;
+            await _dbContext.SaveChangesAsync();
+            return NoContent();
+        }
+        [HttpDelete("delete-schedule/{id}")]
+        public async Task<IActionResult> DeleteSchedule(int id)
+        {
+            var schedule = await _dbContext.Schedules.FindAsync(id);
+            if (schedule == null)
+            {
+                return NotFound();
+            }
+            _dbContext.Schedules.Remove(schedule);
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
         }
         [HttpPost("create-recurring")]
         public async Task<IActionResult> CreateRecurringSchedule(ScheduleDto scheduleDto)

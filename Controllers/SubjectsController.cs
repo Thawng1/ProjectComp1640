@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using ProjectComp1640.Model;
 using ProjectComp1640.Data;
 using System;
-using ProjectComp1640.Dtos.Other;
 using ProjectComp1640.Dtos.Class;
+using ProjectComp1640.Dtos.Subject;
 
 namespace ProjectComp1640.Controllers
 {
@@ -19,15 +19,16 @@ namespace ProjectComp1640.Controllers
             _context = context;
         }
         [HttpGet("get-all-subjects")]
-        public async Task<ActionResult<IEnumerable<Subject>>> GetAllSubjects()
+        public async Task<ActionResult<IEnumerable<GetSubjectDto>>> GetAllSubjects()
         {
             var subjects = await _context.Subjects
                 .Include(s => s.Classes).ThenInclude(c => c.Tutor).ThenInclude(t => t.User)
                 .Include(s => s.Classes).ThenInclude(c => c.ClassStudents).ThenInclude(cs => cs.Student).ThenInclude(s => s.User).
                 ToListAsync();
-            var subjectDtos = subjects.Select(s => new SubjectDto
+            var subjectDtos = subjects.Select(s => new GetSubjectDto
             {
                 SubjectName = s.SubjectName,
+                Information = s.Information,
                 Classes = s.Classes.Select(c => new CreateClassDto
                 {
                     TutorName = c.Tutor.User.FullName ?? "No Tutor",
@@ -43,7 +44,7 @@ namespace ProjectComp1640.Controllers
             return Ok(subjectDtos);
         }
         [HttpGet("get-subject/{id}")]
-        public async Task<ActionResult<SubjectDto>> GetSubject(int id)
+        public async Task<ActionResult<GetSubjectDto>> GetSubject(int id)
         {
             var subject = await _context.Subjects
                 .Include(s => s.Classes).ThenInclude(c => c.Tutor).ThenInclude(t => t.User)
@@ -53,9 +54,10 @@ namespace ProjectComp1640.Controllers
             {
                 return NotFound($"Subject with ID '{id}' not found.");
             }
-            var subjectDto = new SubjectDto
+            var subjectDto = new GetSubjectDto
             {
                 SubjectName = subject.SubjectName,
+                Information = subject.Information,
                 Classes = subject.Classes.Select(c => new CreateClassDto
                 {
                     TutorName = c.Tutor.User.FullName ?? "No Tutor",
