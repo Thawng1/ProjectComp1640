@@ -56,20 +56,6 @@ namespace ProjectComp1640.Controllers
             };
             return Ok(dto);
         }
-        // DELETE: api/Schedule/5
-        [HttpDelete("delete-schedule/{id}")]
-        public async Task<IActionResult> DeleteSchedule(int id)
-        {
-            var schedule = await _dbContext.Schedules.FindAsync(id);
-            if (schedule == null)
-            { 
-                return NotFound();
-            }
-            _dbContext.Schedules.Remove(schedule);
-            await _dbContext.SaveChangesAsync();
-
-            return NoContent();
-        }
         [HttpPost("create-schedule")]
         public async Task<IActionResult> CreateSchedule(ScheduleDto scheduleDto)
         {
@@ -114,6 +100,19 @@ namespace ProjectComp1640.Controllers
             schedule.ClassId = scheduleDto.ClassId;
             schedule.ClassroomId = scheduleDto.ClassroomId;
             await _dbContext.SaveChangesAsync();
+            return NoContent();
+        }
+        [HttpDelete("delete-schedule/{id}")]
+        public async Task<IActionResult> DeleteSchedule(int id)
+        {
+            var schedule = await _dbContext.Schedules.FindAsync(id);
+            if (schedule == null)
+            {
+                return NotFound();
+            }
+            _dbContext.Schedules.Remove(schedule);
+            await _dbContext.SaveChangesAsync();
+
             return NoContent();
         }
         [HttpPost("create-recurring")]
