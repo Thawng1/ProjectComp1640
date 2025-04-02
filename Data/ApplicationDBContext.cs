@@ -89,7 +89,7 @@ namespace ProjectComp1640.Data
                 .HasMany(a => a.Blogs)
                 .WithOne(b => b.User)
                 .HasForeignKey(b => b.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
 
             List<IdentityRole> roles = new List<IdentityRole>
