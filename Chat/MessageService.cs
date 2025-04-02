@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using ProjectComp1640.Data;
 using ProjectComp1640.Model;
+using ProjectComp1640.NotificationConnect;
 
 namespace ProjectComp1640.Chat
 {
@@ -11,12 +12,15 @@ namespace ProjectComp1640.Chat
         private readonly ApplicationDBContext _context;
         private readonly UserManager<AppUser> _userManager;
         private readonly IHubContext<MessageHub> _hubContext;
+        private readonly NotificationService _notificationService;
 
-        public MessageService(ApplicationDBContext context, UserManager<AppUser> userManager, IHubContext<MessageHub> hubContext)
+        public MessageService(ApplicationDBContext context, UserManager<AppUser> userManager, 
+                              IHubContext<MessageHub> hubContext, NotificationService notificationService)
         {
             _context = context;
             _userManager = userManager;
             _hubContext = hubContext;
+            _notificationService = notificationService;
         }
 
         public async Task SendMessage(string senderId, string receiverId, string content)
@@ -44,6 +48,17 @@ namespace ProjectComp1640.Chat
 
             // Gửi tin nhắn đến client của người nhận
             await _hubContext.Clients.User(receiverId).SendAsync("ReceiveMessage", senderId, content);
+
+            // Gửi thông báo realtime
+            string notiMessage = $"📩 Bạn có tin nhắn mới từ {sender.UserName}";
+            string actionUrl = $"/chat/{senderId}"; // hoặc tùy chỉnh URL hội thoại
+
+            await _notificationService.SendNotification(
+                receiverId,
+                notiMessage,
+                actionUrl,
+                senderId
+            );
         }
         public async Task<List<Messages>> GetMessages(string senderId, string receiverId)
         {
