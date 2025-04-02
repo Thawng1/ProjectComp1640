@@ -1,6 +1,6 @@
 ﻿namespace ProjectComp1640.Dtos.Class
 {
-    public class GetAllClassesDto
+    public class GetClassDto
     {
         public int id { get; set; }
         public string TutorName { get; set; }
