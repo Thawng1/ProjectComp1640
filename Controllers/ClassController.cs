@@ -71,14 +71,14 @@ namespace ProjectComp1640.Controllers
         }
 
         [HttpGet("get-all-classes")]
-        public async Task<ActionResult<IEnumerable<GetAllClassesDto>>> GetAllClasses()
+        public async Task<ActionResult<IEnumerable<GetClassDto>>> GetAllClasses()
         {
             var classes = await _context.Classes
                 .Include(c => c.Tutor).ThenInclude(t => t.User)
                 .Include(c => c.Subject)
                 .Include(c => c.ClassStudents).ThenInclude(cs => cs.Student).ThenInclude(s => s.User)
                 .ToListAsync();
-            var classDTOs = classes.Select(c => new GetAllClassesDto
+            var classDTOs = classes.Select(c => new GetClassDto
             {
                 id = c.Id,
                 TutorName = c.Tutor?.User?.FullName ?? "No Tutor",
@@ -94,7 +94,7 @@ namespace ProjectComp1640.Controllers
             return Ok(classDTOs);
         }
         [HttpGet("get-class/{id}")]
-        public async Task<ActionResult<CreateClassDto>> GetClass(int id)
+        public async Task<ActionResult<GetClassDto>> GetClass(int id)
         {
             var cls = await _context.Classes
                 .Include(c => c.Subject)
@@ -105,8 +105,9 @@ namespace ProjectComp1640.Controllers
             {
                 return NotFound("Không tìm thấy lớp.");
             }
-            var classDto = new CreateClassDto
+            var classDto = new GetClassDto
             {
+                id = cls.Id,
                 TutorName = cls.Tutor.User.FullName,
                 SubjectName = cls.Subject.SubjectName,
                 ClassName = cls.ClassName,

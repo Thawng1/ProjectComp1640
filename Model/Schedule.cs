@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public DateTime ScheduleDate { get; set; }
-        public DayOfWeek Day { get; set; }
+        public DayOfWeek Day { get; set; } //0: Sunday -> 6: Saturday
         public string Slot { get; set; }
         public string LinkMeeting { get; set; }
         public int? ClassId { get; set; }

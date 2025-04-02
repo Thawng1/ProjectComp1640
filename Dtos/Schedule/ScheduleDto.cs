@@ -1,4 +1,4 @@
-﻿namespace ProjectComp1640.Dtos.Other
+﻿namespace ProjectComp1640.Dtos.Schedule
 {
     public class ScheduleDto
     {
