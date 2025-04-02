@@ -67,6 +67,8 @@ namespace ProjectComp1640.Controllers
         {
             var blogs = await _context.Blogs
                 .Include(b => b.User)
+                .Include(b => b.Comments)
+              //.ThenInclude(c => c.User)
                 .Select(b => new
                 {
                     b.Id,
@@ -75,6 +77,13 @@ namespace ProjectComp1640.Controllers
                     b.Url,
                     b.CreatedAt,
                     User = b.User.FullName,
+                    Comments = b.Comments.Select(c => new
+                    {
+                        c.Id,
+                        c.Content,
+                        c.CreatedOn,
+                      //User = c.User != null ? c.User.FullName : "Unknown User"
+                    }).ToList()
                 }).ToListAsync();
             return Ok(blogs);
         }
