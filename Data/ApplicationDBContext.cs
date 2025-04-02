@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProjectComp1640.Model;
+using System.Reflection.Emit;
 
 namespace ProjectComp1640.Data
 {
@@ -22,9 +23,35 @@ namespace ProjectComp1640.Data
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<Classroom> Classrooms { get; set; }
         public DbSet<Blog> Blogs { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.Entity<Notification>()
+                .HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Notification>()
+                .HasOne(n => n.Sender)
+                .WithMany()
+                .HasForeignKey(n => n.SenderId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<Comment>()
+               .HasOne(c => c.User)
+               .WithMany(b => b.Comments)
+               .HasForeignKey(c => c.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
+            // Quan hệ giữa Blog và Comment
+            builder.Entity<Comment>()
+                .HasOne(c => c.Blog)
+                .WithMany(b => b.Comments)
+                .HasForeignKey(c => c.BlogId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<Messages>()
                 .HasOne(m => m.Sender)
                 .WithMany()
@@ -92,25 +119,7 @@ namespace ProjectComp1640.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
 
-            List<IdentityRole> roles = new List<IdentityRole>
-            {
-                new IdentityRole
-                {
-                    Name = "Admin",
-                    NormalizedName = "ADMIN"
-                },
-                new IdentityRole
-                {
-                    Name = "Tutor",
-                    NormalizedName = "TUTOR"
-                },
-                new IdentityRole
-                {
-                     Name = "Student",
-                    NormalizedName = "STUDENT"
-                },
-            };
-            builder.Entity<IdentityRole>().HasData(roles);
+           
         }
     }
 }

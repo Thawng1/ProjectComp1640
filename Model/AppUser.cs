@@ -8,5 +8,6 @@ namespace ProjectComp1640.Model
         public virtual Student Students { get; set; }
         public virtual Tutor Tutors { get; set; }
         public virtual ICollection<Blog> Blogs { get; set; }
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }
 }
