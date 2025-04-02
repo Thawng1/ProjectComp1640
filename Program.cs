@@ -121,6 +121,17 @@ using (var scope = app.Services.CreateScope())
         var userManager = services.GetRequiredService<UserManager<AppUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         var context = services.GetRequiredService<ApplicationDBContext>();
+        // ✅ Seed vai trò nếu chưa có
+        string[] roleNames = { "Admin", "Tutor", "Student" };
+
+        foreach (var roleName in roleNames)
+        {
+            var roleExist = await roleManager.RoleExistsAsync(roleName);
+            if (!roleExist)
+            {
+                await roleManager.CreateAsync(new IdentityRole(roleName));
+            }
+        }
 
         await DataSeeder.SeedAdminUser(userManager, roleManager, context);
         Console.WriteLine("✅ Seed dữ liệu Admin thành công.");
