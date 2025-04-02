@@ -76,7 +76,7 @@ namespace ProjectComp1640.Controllers
             var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
             if (cls == null)
             {
-                return NotFound("Class not found");
+                return NotFound("Không tìm thấy Lớp học");
             }
             var current = cls.StartDate;
             while (current.DayOfWeek != scheduleDto.Day)
@@ -95,6 +95,26 @@ namespace ProjectComp1640.Controllers
             _dbContext.Schedules.Add(schedule);
             await _dbContext.SaveChangesAsync();
             return CreatedAtAction(nameof(GetSchedule), new { id = schedule.Id }, scheduleDto);
+        }
+        [HttpPut("update-schedule/{id}")]
+        public async Task<IActionResult> UpdateSchedule(int id, ScheduleDto scheduleDto)
+        {
+            var schedule = await _dbContext.Schedules.FindAsync(id);
+            if (schedule == null)
+            {
+                return NotFound("Không tìm thấy lịch học này");
+            }
+            var cls = await _dbContext.Classes.FindAsync(id);
+            if (cls == null) {
+                return NotFound("Không tìm thấy Lớp học");
+            }
+            schedule.Day = scheduleDto.Day;
+            schedule.Slot = scheduleDto.Slot;
+            schedule.LinkMeeting = scheduleDto.LinkMeeting;
+            schedule.ClassId = scheduleDto.ClassId;
+            schedule.ClassroomId = scheduleDto.ClassroomId;
+            await _dbContext.SaveChangesAsync();
+            return NoContent();
         }
         [HttpPost("create-recurring")]
         public async Task<IActionResult> CreateRecurringSchedule(ScheduleDto scheduleDto)
