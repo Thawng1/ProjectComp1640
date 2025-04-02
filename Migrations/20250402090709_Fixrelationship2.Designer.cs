@@ -12,8 +12,8 @@ using ProjectComp1640.Data;
 namespace ProjectComp1640.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250327051529_FixRelationship")]
-    partial class FixRelationship
+    [Migration("20250402090709_Fixrelationship2")]
+    partial class Fixrelationship2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,26 +50,6 @@ namespace ProjectComp1640.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "750eb95f-fee8-4475-bb72-641ad785d4f9",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "0c542ffd-2f67-42f1-8ba0-40b30270da4e",
-                            Name = "Tutor",
-                            NormalizedName = "TUTOR"
-                        },
-                        new
-                        {
-                            Id = "9f1bda12-ec7f-443b-b483-83fee7ddcfe5",
-                            Name = "Student",
-                            NormalizedName = "STUDENT"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -292,7 +272,6 @@ namespace ProjectComp1640.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Url")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -380,6 +359,37 @@ namespace ProjectComp1640.Migrations
                     b.ToTable("Classrooms");
                 });
 
+            modelBuilder.Entity("ProjectComp1640.Model.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BlogId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BlogId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("ProjectComp1640.Model.Messages", b =>
                 {
                     b.Property<int>("Id")
@@ -410,6 +420,43 @@ namespace ProjectComp1640.Migrations
                     b.HasIndex("SenderId");
 
                     b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("ProjectComp1640.Model.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Schedule", b =>
@@ -602,7 +649,7 @@ namespace ProjectComp1640.Migrations
                     b.HasOne("ProjectComp1640.Model.AppUser", "User")
                         .WithMany("Blogs")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -644,6 +691,24 @@ namespace ProjectComp1640.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("ProjectComp1640.Model.Comment", b =>
+                {
+                    b.HasOne("ProjectComp1640.Model.Blog", "Blog")
+                        .WithMany("Comments")
+                        .HasForeignKey("BlogId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("ProjectComp1640.Model.AppUser", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Blog");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ProjectComp1640.Model.Messages", b =>
                 {
                     b.HasOne("ProjectComp1640.Model.AppUser", "Receiver")
@@ -661,6 +726,24 @@ namespace ProjectComp1640.Migrations
                     b.Navigation("Receiver");
 
                     b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("ProjectComp1640.Model.Notification", b =>
+                {
+                    b.HasOne("ProjectComp1640.Model.AppUser", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ProjectComp1640.Model.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Sender");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Schedule", b =>
@@ -706,11 +789,18 @@ namespace ProjectComp1640.Migrations
                 {
                     b.Navigation("Blogs");
 
+                    b.Navigation("Comments");
+
                     b.Navigation("Students")
                         .IsRequired();
 
                     b.Navigation("Tutors")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ProjectComp1640.Model.Blog", b =>
+                {
+                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("ProjectComp1640.Model.Class", b =>

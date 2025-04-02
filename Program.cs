@@ -43,8 +43,13 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+});
 
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<IComment, CommentService>();
 
 // Kết nối Database
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
@@ -116,6 +121,17 @@ using (var scope = app.Services.CreateScope())
         var userManager = services.GetRequiredService<UserManager<AppUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         var context = services.GetRequiredService<ApplicationDBContext>();
+        // ✅ Seed vai trò nếu chưa có
+        string[] roleNames = { "Admin", "Tutor", "Student" };
+
+        foreach (var roleName in roleNames)
+        {
+            var roleExist = await roleManager.RoleExistsAsync(roleName);
+            if (!roleExist)
+            {
+                await roleManager.CreateAsync(new IdentityRole(roleName));
+            }
+        }
 
         await DataSeeder.SeedAdminUser(userManager, roleManager, context);
         Console.WriteLine("✅ Seed dữ liệu Admin thành công.");
