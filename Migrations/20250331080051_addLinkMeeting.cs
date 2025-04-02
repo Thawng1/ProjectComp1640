@@ -7,20 +7,21 @@
 namespace ProjectComp1640.Migrations
 {
     /// <inheritdoc />
-    public partial class AddAppUser : Migration
+    public partial class addLinkMeeting : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            
+
 
             migrationBuilder.AddColumn<string>(
-                name: "FullName",
-                table: "AspNetUsers",
+                name: "LinkMeeting",
+                table: "Schedules",
                 type: "nvarchar(max)",
-                nullable: true);
+                nullable: false,
+                defaultValue: "");
 
-            
+
         }
 
         /// <inheritdoc />
@@ -29,8 +30,8 @@ namespace ProjectComp1640.Migrations
             
 
             migrationBuilder.DropColumn(
-                name: "FullName",
-                table: "AspNetUsers");
+                name: "LinkMeeting",
+                table: "Schedules");
 
             
         }

@@ -1,4 +1,4 @@
-﻿namespace ProjectComp1640.Dtos.Other
+﻿namespace ProjectComp1640.Dtos.Classroom
 {
     public class ClassroomDto
     {

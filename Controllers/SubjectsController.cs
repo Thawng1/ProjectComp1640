@@ -5,6 +5,7 @@ using ProjectComp1640.Model;
 using ProjectComp1640.Data;
 using System;
 using ProjectComp1640.Dtos.Other;
+using ProjectComp1640.Dtos.Class;
 
 namespace ProjectComp1640.Controllers
 {
@@ -17,22 +18,59 @@ namespace ProjectComp1640.Controllers
         {
             _context = context;
         }
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Subject>>> GetSubjects()
+        [HttpGet("get-all-subjects")]
+        public async Task<ActionResult<IEnumerable<Subject>>> GetAllSubjects()
         {
-            return await _context.Subjects.ToListAsync();
+            var subjects = await _context.Subjects
+                .Include(s => s.Classes).ThenInclude(c => c.Tutor).ThenInclude(t => t.User)
+                .Include(s => s.Classes).ThenInclude(c => c.ClassStudents).ThenInclude(cs => cs.Student).ThenInclude(s => s.User).
+                ToListAsync();
+            var subjectDtos = subjects.Select(s => new SubjectDto
+            {
+                SubjectName = s.SubjectName,
+                Classes = s.Classes.Select(c => new CreateClassDto
+                {
+                    TutorName = c.Tutor.User.FullName ?? "No Tutor",
+                    SubjectName = c.Subject.SubjectName ?? "No Subject",
+                    ClassName = c.ClassName,
+                    TotalSlot = c.TotalSlot,
+                    StartDate = c.StartDate,
+                    EndDate = c.EndDate,
+                    Description = c.Description,
+                    StudentNames = c.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.User.FullName).ToList()
+                }).ToList()
+            }).ToList();
+            return Ok(subjectDtos);
         }
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Subject>> GetSubject(int id)
+        [HttpGet("get-subject/{id}")]
+        public async Task<ActionResult<SubjectDto>> GetSubject(int id)
         {
-            var subject = await _context.Subjects.FindAsync(id);
+            var subject = await _context.Subjects
+                .Include(s => s.Classes).ThenInclude(c => c.Tutor).ThenInclude(t => t.User)
+                .Include(s => s.Classes).ThenInclude(c => c.ClassStudents).ThenInclude(cs => cs.Student).ThenInclude(s => s.User)
+                .FirstOrDefaultAsync(s => s.Id == id);
             if (subject == null)
             {
-                return NotFound(new { message = "Subject not found." });
+                return NotFound($"Subject with ID '{id}' not found.");
             }
-            return Ok(subject);
+            var subjectDto = new SubjectDto
+            {
+                SubjectName = subject.SubjectName,
+                Classes = subject.Classes.Select(c => new CreateClassDto
+                {
+                    TutorName = c.Tutor.User.FullName ?? "No Tutor",
+                    SubjectName = c.Subject.SubjectName ?? "No Subject",
+                    ClassName = c.ClassName,
+                    TotalSlot = c.TotalSlot,
+                    StartDate = c.StartDate,
+                    EndDate = c.EndDate,
+                    Description = c.Description,
+                    StudentNames = c.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.User.FullName).ToList()
+                }).ToList()
+            };
+            return Ok(subjectDto);
         }
-        [HttpPost]
+        [HttpPost("create-subject")]
         public async Task<ActionResult<Subject>> CreateSubject(SubjectDto subjectDto)
         {
             var newSubject = new Subject
@@ -44,7 +82,7 @@ namespace ProjectComp1640.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetSubject), new { id = newSubject.Id }, new { message = "Subject created successfully.", subjectDto });
         }
-        [HttpPut("{id}")]
+        [HttpPut("update-subject/{id}")]
         public async Task<IActionResult> UpdateSubject(int id, SubjectDto subjectDto)
         {
             var sbj = await _context.Subjects.FirstOrDefaultAsync(s => s.Id == id);
@@ -67,7 +105,7 @@ namespace ProjectComp1640.Controllers
             }
             return Ok(new { message = "Subject updated successfully." });
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("delete-subject/{id}")]
         public async Task<IActionResult> DeleteSubject(int id)
         {
             var subject = await _context.Subjects.FindAsync(id);
