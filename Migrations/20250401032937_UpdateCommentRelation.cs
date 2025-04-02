@@ -48,7 +48,7 @@ namespace ProjectComp1640.Migrations
                         column: x => x.BlogId,
                         principalTable: "Blogs",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             

@@ -41,16 +41,18 @@ namespace ProjectComp1640.Data
                 .OnDelete(DeleteBehavior.SetNull);
 
             builder.Entity<Comment>()
-               .HasOne(c => c.User)
-               .WithMany(b => b.Comments)
-               .HasForeignKey(c => c.UserId)
-               .OnDelete(DeleteBehavior.Cascade);
-            // Quan hệ giữa Blog và Comment
+                 .HasOne(c => c.User)
+                 .WithMany(b => b.Comments)
+                 .HasForeignKey(c => c.UserId)
+                 .OnDelete(DeleteBehavior.Cascade); // Giữ cascade ở đây
+
             builder.Entity<Comment>()
                 .HasOne(c => c.Blog)
                 .WithMany(b => b.Comments)
                 .HasForeignKey(c => c.BlogId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction); // Đổi thành NO ACTION
+
+
 
             builder.Entity<Messages>()
                 .HasOne(m => m.Sender)
