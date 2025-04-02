@@ -13,20 +13,7 @@ namespace ProjectComp1640.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "1ba33453-6f8f-45a7-8fa4-67afcfd20594");
-
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "357efb56-7ef7-4ab6-a9f8-cc66f5b5a668");
-
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "d04d0419-ab47-45d0-8121-410ebc6d4014");
+            
 
             migrationBuilder.CreateTable(
                 name: "Classes",
@@ -73,15 +60,7 @@ namespace ProjectComp1640.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "21d07253-5d1b-4559-8e94-c816ba2ac1a7", null, "Tutor", "TUTOR" },
-                    { "667ef105-762e-425a-a9db-a5114ae5753a", null, "Student", "STUDENT" },
-                    { "b57d62bd-572b-4629-ac6e-19942a4c06d9", null, "Admin", "ADMIN" }
-                });
+            
 
             migrationBuilder.CreateIndex(
                 name: "IX_Classes_TutorId",
@@ -103,30 +82,7 @@ namespace ProjectComp1640.Migrations
             migrationBuilder.DropTable(
                 name: "Classes");
 
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "21d07253-5d1b-4559-8e94-c816ba2ac1a7");
-
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "667ef105-762e-425a-a9db-a5114ae5753a");
-
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "b57d62bd-572b-4629-ac6e-19942a4c06d9");
-
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "1ba33453-6f8f-45a7-8fa4-67afcfd20594", null, "Tutor", "TUTOR" },
-                    { "357efb56-7ef7-4ab6-a9f8-cc66f5b5a668", null, "Student", "STUDENT" },
-                    { "d04d0419-ab47-45d0-8121-410ebc6d4014", null, "Admin", "ADMIN" }
-                });
+            
         }
     }
 }

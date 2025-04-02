@@ -13,20 +13,7 @@ namespace ProjectComp1640.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "3585a580-d3a5-4d06-8d9d-fdda76f914cf");
-
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "4dd5d9ec-ac1a-4bde-9e80-926ab215a9cb");
-
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "e3a1d172-26e5-4ff2-8d7f-d73368b4d48b");
+           
 
             migrationBuilder.CreateTable(
                 name: "Notifications",
@@ -74,15 +61,7 @@ namespace ProjectComp1640.Migrations
             migrationBuilder.DropTable(
                 name: "Notifications");
 
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "3585a580-d3a5-4d06-8d9d-fdda76f914cf", null, "Student", "STUDENT" },
-                    { "4dd5d9ec-ac1a-4bde-9e80-926ab215a9cb", null, "Tutor", "TUTOR" },
-                    { "e3a1d172-26e5-4ff2-8d7f-d73368b4d48b", null, "Admin", "ADMIN" }
-                });
+
         }
     }
 }
