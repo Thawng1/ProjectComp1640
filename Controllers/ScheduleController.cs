@@ -207,7 +207,6 @@ namespace ProjectComp1640.Controllers
             {
                 current = current.AddDays(1);
             }
-            var schedules = new List<Schedule>();
             while (current <= cls.EndDate)
             {
                 scheduleDates.Add(current);
@@ -229,6 +228,15 @@ namespace ProjectComp1640.Controllers
                         Conflicts = dupSchedule.Select(d => d.ToString("yyyy-MM-dd"))
                     });
             }
+            var schedules = scheduleDates.Select(date => new Schedule
+            {
+                ScheduleDate = date,
+                Day = scheduleDto.Day,
+                Slot = scheduleDto.Slot,
+                LinkMeeting = scheduleDto.LinkMeeting,
+                ClassId = scheduleDto.ClassId,
+                ClassroomId = scheduleDto.ClassroomId
+            }).ToList();
             _dbContext.Schedules.AddRange(schedules);
             await _dbContext.SaveChangesAsync();
             return Ok(new
