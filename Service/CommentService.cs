@@ -25,7 +25,7 @@ namespace ProjectComp1640.Service
 
         public async Task<List<Comment>> GetAllAsync()
         {
-            return await _context.Comments.ToListAsync();
+            return await _context.Comments.Include(c => c.User).ToListAsync();
         }
 
         public async Task<IEnumerable<Comment>> GetByBlogIdAsync(int blogId)
@@ -57,6 +57,10 @@ namespace ProjectComp1640.Service
             _context.Comments.Update(existingComment);
             await _context.SaveChangesAsync();
             return existingComment;
+        }
+        public async Task<Blog?> GetBlogByIdAsync(int blogId)
+        {
+            return await _context.Blogs.FirstOrDefaultAsync(b => b.Id == blogId);
         }
     }
 }
