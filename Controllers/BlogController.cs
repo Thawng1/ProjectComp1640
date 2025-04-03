@@ -82,7 +82,7 @@ namespace ProjectComp1640.Controllers
                         c.Id,
                         c.Content,
                         c.CreatedOn,
-                      //User = c.User != null ? c.User.FullName : "Unknown User"
+                        User = c.User != null ? c.User.FullName : "Unknown User"
                     }).ToList()
                 }).ToListAsync();
             return Ok(blogs);
