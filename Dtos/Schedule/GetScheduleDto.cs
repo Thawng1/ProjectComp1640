@@ -3,6 +3,7 @@
     public class GetScheduleDto
     {
         public int Id { get; set; }
+        public DateTime ScheduleDate { get; set; }
         public DayOfWeek Day { get; set; }
         public string Slot { get; set; }
         public string LinkMeeting { get; set; }
