@@ -31,8 +31,8 @@ namespace ProjectComp1640.Controllers
                 Information = s.Information,
                 Classes = s.Classes.Select(c => new CreateClassDto
                 {
-                    TutorName = c.Tutor.User.FullName ?? "No Tutor",
-                    SubjectName = c.Subject.SubjectName ?? "No Subject",
+                    TutorName = c.Tutor.User.FullName ?? "Không có giáo viên",
+                    SubjectName = c.Subject.SubjectName ?? "Không có môn học",
                     ClassName = c.ClassName,
                     TotalSlot = c.TotalSlot,
                     StartDate = c.StartDate,
@@ -52,7 +52,7 @@ namespace ProjectComp1640.Controllers
                 .FirstOrDefaultAsync(s => s.Id == id);
             if (subject == null)
             {
-                return NotFound($"Subject with ID '{id}' not found.");
+                return NotFound($"Không tìm thấy môn học với ID '{id}'.");
             }
             var subjectDto = new GetSubjectDto
             {
@@ -60,8 +60,8 @@ namespace ProjectComp1640.Controllers
                 Information = subject.Information,
                 Classes = subject.Classes.Select(c => new CreateClassDto
                 {
-                    TutorName = c.Tutor.User.FullName ?? "No Tutor",
-                    SubjectName = c.Subject.SubjectName ?? "No Subject",
+                    TutorName = c.Tutor.User.FullName ?? "Không có giáo viên",
+                    SubjectName = c.Subject.SubjectName ?? "Không có môn học",
                     ClassName = c.ClassName,
                     TotalSlot = c.TotalSlot,
                     StartDate = c.StartDate,
@@ -82,7 +82,7 @@ namespace ProjectComp1640.Controllers
             };
             _context.Subjects.Add(newSubject);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetSubject), new { id = newSubject.Id }, new { message = "Subject created successfully.", subjectDto });
+            return CreatedAtAction(nameof(GetSubject), new { id = newSubject.Id }, new { message = "Tạo môn thành công.", subjectDto });
         }
         [HttpPut("update-subject/{id}")]
         public async Task<IActionResult> UpdateSubject(int id, SubjectDto subjectDto)
@@ -98,14 +98,14 @@ namespace ProjectComp1640.Controllers
             {
                 if (!_context.Subjects.Any(s => s.Id == id))
                 {
-                    return NotFound(new { message = "Subject not found." });
+                    return NotFound(new { message = "Không tìm thấy môn học này." });
                 }
                 else
                 {
                     throw;
                 }
             }
-            return Ok(new { message = "Subject updated successfully." });
+            return Ok(new { message = "Cập nhật môn thành công." });
         }
         [HttpDelete("delete-subject/{id}")]
         public async Task<IActionResult> DeleteSubject(int id)
@@ -113,11 +113,11 @@ namespace ProjectComp1640.Controllers
             var subject = await _context.Subjects.FindAsync(id);
             if (subject == null)
             {
-                return NotFound(new { message = "Subject not found." });
+                return NotFound(new { message = "Không tìm thấy môn học này." });
             }
             _context.Subjects.Remove(subject);
             await _context.SaveChangesAsync();
-            return Ok(new { message = "Subject deleted successfully." });
+            return Ok(new { message = "Xóa môn thành công." });
         }
     }
 }
