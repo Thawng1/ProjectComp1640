@@ -12,7 +12,8 @@ namespace ProjectComp1640.Converters
                 Id = comment.Id,
                 Content = comment.Content,
                 CreatedOn = comment.CreatedOn,
-                UserFullName = comment.User?.FullName ?? "Unknown User"
+                UserFullName = comment.User?.FullName ?? "Unknown User",
+                UserId = comment.UserId
             };
         }
         public static Comment ToCommentFromCreate(this CreateCommentDto dto, string userId)

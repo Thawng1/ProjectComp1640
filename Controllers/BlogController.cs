@@ -68,7 +68,7 @@ namespace ProjectComp1640.Controllers
             var blogs = await _context.Blogs
                 .Include(b => b.User)
                 .Include(b => b.Comments)
-              //.ThenInclude(c => c.User)
+                .ThenInclude(c => c.User)
                 .Select(b => new
                 {
                     b.Id,
