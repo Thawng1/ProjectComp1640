@@ -76,7 +76,7 @@ namespace ProjectComp1640.Controllers
                     b.Content,
                     b.Url,
                     b.CreatedAt,
-                    User = b.User.FullName,
+                    User = b.User.UserName,
                     Comments = b.Comments.Select(c => new
                     {
                         c.Id,
@@ -101,7 +101,7 @@ namespace ProjectComp1640.Controllers
                     b.Content,
                     b.Url,
                     b.CreatedAt,
-                    User = b.User != null ? b.User.FullName : "Unknown User"
+                    User = b.User != null ? b.User.UserName : "Unknown User"
                 })
                 .FirstOrDefaultAsync();
 
