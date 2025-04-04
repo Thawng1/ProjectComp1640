@@ -150,13 +150,22 @@ namespace ProjectComp1640.Controllers
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteBlog(int id)
         {
-            var blog = await _context.Blogs.FindAsync(id);
-            if (blog == null) 
+            // Load blog kèm theo các comment liên quan
+            var blog = await _context.Blogs
+                            .Include(b => b.Comments)
+                            .FirstOrDefaultAsync(b => b.Id == id);
+            if (blog == null)
                 return NotFound();
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (blog.UserId != userId && !(User.IsInRole("Admin"))) 
+            if (blog.UserId != userId && !User.IsInRole("Admin"))
                 return Forbid();
+
+            // Xóa các comment liên quan trước
+            if (blog.Comments != null && blog.Comments.Any())
+            {
+                _context.Comments.RemoveRange(blog.Comments);
+            }
 
             _context.Blogs.Remove(blog);
             await _context.SaveChangesAsync();
