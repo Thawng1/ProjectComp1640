@@ -68,7 +68,7 @@ namespace ProjectComp1640.Controllers
             var blogs = await _context.Blogs
                 .Include(b => b.User)
                 .Include(b => b.Comments)
-              //.ThenInclude(c => c.User)
+                .ThenInclude(c => c.User)
                 .Select(b => new
                 {
                     b.Id,
@@ -76,13 +76,13 @@ namespace ProjectComp1640.Controllers
                     b.Content,
                     b.Url,
                     b.CreatedAt,
-                    User = b.User.FullName,
+                    User = b.User.UserName,
                     Comments = b.Comments.Select(c => new
                     {
                         c.Id,
                         c.Content,
                         c.CreatedOn,
-                      //User = c.User != null ? c.User.FullName : "Unknown User"
+                        User = c.User != null ? c.User.FullName : "Unknown User"
                     }).ToList()
                 }).ToListAsync();
             return Ok(blogs);
@@ -101,7 +101,7 @@ namespace ProjectComp1640.Controllers
                     b.Content,
                     b.Url,
                     b.CreatedAt,
-                    User = b.User != null ? b.User.FullName : "Unknown User"
+                    User = b.User != null ? b.User.UserName : "Unknown User"
                 })
                 .FirstOrDefaultAsync();
 
@@ -150,13 +150,22 @@ namespace ProjectComp1640.Controllers
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteBlog(int id)
         {
-            var blog = await _context.Blogs.FindAsync(id);
-            if (blog == null) 
+            // Load blog kèm theo các comment liên quan
+            var blog = await _context.Blogs
+                            .Include(b => b.Comments)
+                            .FirstOrDefaultAsync(b => b.Id == id);
+            if (blog == null)
                 return NotFound();
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (blog.UserId != userId && !(User.IsInRole("Admin"))) 
+            if (blog.UserId != userId && !User.IsInRole("Admin"))
                 return Forbid();
+
+            // Xóa các comment liên quan trước
+            if (blog.Comments != null && blog.Comments.Any())
+            {
+                _context.Comments.RemoveRange(blog.Comments);
+            }
 
             _context.Blogs.Remove(blog);
             await _context.SaveChangesAsync();

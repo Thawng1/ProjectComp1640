@@ -11,5 +11,7 @@ namespace ProjectComp1640.Interfaces
         Task<Comment?> UpdateAsync(int id, Comment commentModel);
         Task DeleteAsync(Comment comment);
         Task<IEnumerable<Comment>> GetByBlogIdAsync(int blogId);
+        Task<Blog?> GetBlogByIdAsync(int blogId);
+
     }
 }

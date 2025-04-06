@@ -6,6 +6,7 @@ using ProjectComp1640.Dtos.Comment;
 using ProjectComp1640.Interfaces;
 using ProjectComp1640.Migrations;
 using ProjectComp1640.Model;
+using ProjectComp1640.NotificationConnect;
 using System.Security.Claims;
 
 namespace ProjectComp1640.Controllers
@@ -15,10 +16,12 @@ namespace ProjectComp1640.Controllers
     public class CommentController : ControllerBase
     {
         private readonly IComment _IComment;
-        
-        public CommentController(IComment IComment)
+        private readonly NotificationService _notificationService;
+
+        public CommentController(IComment IComment, NotificationService notificationService)
         {
             _IComment = IComment;
+            _notificationService = notificationService;
         }
         // -------------------------- Lấy tất cả bình luận --------------------------
         [HttpGet]
@@ -73,6 +76,19 @@ namespace ProjectComp1640.Controllers
 
             var comment = dto.ToCommentFromCreate(userId);
             await _IComment.CreateAsync(comment);
+
+            // ✅ Gửi thông báo cho chủ blog (nếu không phải người comment)
+            var blog = await _IComment.GetBlogByIdAsync(dto.BlogId); // bạn cần tạo hàm này trong IComment
+            if (blog != null && blog.UserId != userId)
+            {
+                await _notificationService.SendNotification(
+                    receiverId: blog.UserId,
+                    senderId: userId,
+                    message: "Bài viết của bạn vừa nhận một bình luận mới.",
+                    actionUrl: $"/blogs/{dto.BlogId}"
+                );
+            }
+
 
             return Ok(new { message = "Comment created successfully." });
         }
