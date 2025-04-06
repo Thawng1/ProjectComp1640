@@ -16,16 +16,54 @@ namespace ProjectComp1640.Controllers
         {
             _dbContext = dbContext;
         }
-        // GET: api/Schedule
+        [HttpPost("create-schedule")]
+        public async Task<IActionResult> CreateSchedule(ScheduleDto scheduleDto)
+        {
+            var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
+            if (cls == null)
+            {
+                return NotFound("Không tìm thấy Lớp học");
+            }
+            var clsrm = await _dbContext.Classrooms.AnyAsync(c => c.Id == scheduleDto.ClassroomId);
+            if (!clsrm)
+            {
+                return NotFound($"Không tìm thấy phòng học với ID {scheduleDto.ClassroomId}.");
+            }
+            var dupSchedule = await _dbContext.Schedules.AnyAsync(s =>
+                s.ScheduleDate == scheduleDto.ScheduleDate &&
+                s.Day == scheduleDto.Day &&
+                s.Slot == scheduleDto.Slot &&
+                s.ClassId == scheduleDto.ClassId &&
+                s.ClassroomId == scheduleDto.ClassroomId
+                );
+            if (dupSchedule)
+            {
+                return BadRequest($"Đã có lịch học trùng của lớp {scheduleDto.ClassId} lớp học {scheduleDto.ClassroomId} vào thứ {scheduleDto.Day}, ngày ({scheduleDto.ScheduleDate:yyyy-MM-dd}) ở tiết học thứ {scheduleDto.Slot}.");
+            }
+            var schedule = new Schedule
+            {
+                ScheduleDate = scheduleDto.ScheduleDate,
+                Day = scheduleDto.Day,
+                Slot = scheduleDto.Slot,
+                LinkMeeting = scheduleDto.LinkMeeting,
+                ClassId = scheduleDto.ClassId,
+                ClassroomId = scheduleDto.ClassroomId
+            };
+            _dbContext.Schedules.Add(schedule);
+            await _dbContext.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetSchedule), new { id = schedule.Id }, new { message = "Thêm lịch thành công", scheduleDto });
+        }
         [HttpGet("get-all-schedules")]
-        public async Task<ActionResult<IEnumerable<ScheduleDto>>> GetSchedules()
+        public async Task<ActionResult<IEnumerable<GetScheduleDto>>> GetSchedules()
         {
             var schedules = await _dbContext.Schedules
                 .Include(s => s.Class)
                 .Include(s => s.Classroom)
                 .ToListAsync();
-            var scheduleList = schedules.Select(s => new ScheduleDto
+            var scheduleList = schedules.Select(s => new GetScheduleDto
             {
+                Id = s.Id,
+                ScheduleDate = s.ScheduleDate,
                 Day = s.Day,
                 Slot = s.Slot,
                 LinkMeeting = s.LinkMeeting,
@@ -34,9 +72,8 @@ namespace ProjectComp1640.Controllers
             });
             return Ok(scheduleList);
         }
-        // GET: api/Schedule/5
         [HttpGet("get-schedule/{id}")]
-        public async Task<ActionResult<ScheduleDto>> GetSchedule(int id)
+        public async Task<ActionResult<GetScheduleDto>> GetSchedule(int id)
         {
             var s = await _dbContext.Schedules
                 .Include(s => s.Class)
@@ -46,8 +83,10 @@ namespace ProjectComp1640.Controllers
             {
                 return NotFound();
             }
-            var dto = new ScheduleDto
+            var dto = new GetScheduleDto
             {
+                Id = s.Id,
+                ScheduleDate = s.ScheduleDate,
                 Day = s.Day,
                 Slot = s.Slot,
                 LinkMeeting = s.LinkMeeting,
@@ -56,43 +95,33 @@ namespace ProjectComp1640.Controllers
             };
             return Ok(dto);
         }
-        [HttpPost("create-schedule")]
-        public async Task<IActionResult> CreateSchedule(ScheduleDto scheduleDto)
-        {
-            var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
-            if (cls == null)
-            {
-                return NotFound("Không tìm thấy Lớp học");
-            }
-            var current = cls.StartDate;
-            while (current.DayOfWeek != scheduleDto.Day)
-            {
-                current = current.AddDays(1);
-            }
-            var schedule = new Schedule
-            {
-                ScheduleDate = current,
-                Day = scheduleDto.Day,
-                Slot = scheduleDto.Slot,
-                LinkMeeting = scheduleDto.LinkMeeting,
-                ClassId = scheduleDto.ClassId,
-                ClassroomId = scheduleDto.ClassroomId
-            };
-            _dbContext.Schedules.Add(schedule);
-            await _dbContext.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetSchedule), new { id = schedule.Id }, scheduleDto);
-        }
         [HttpPut("update-schedule/{id}")]
         public async Task<IActionResult> UpdateSchedule(int id, ScheduleDto scheduleDto)
         {
             var schedule = await _dbContext.Schedules.FindAsync(id);
             if (schedule == null)
             {
-                return NotFound("Không tìm thấy lịch học này");
+                return NotFound("Không tìm thấy lịch học này.");
             }
             var cls = await _dbContext.Classes.FindAsync(id);
             if (cls == null) {
-                return NotFound("Không tìm thấy Lớp học");
+                return NotFound("Không tìm thấy Lớp học.");
+            }
+            var clsrm = await _dbContext.Classrooms.FindAsync(id);
+            if (clsrm == null)
+            {
+                return NotFound($"Không tìm thấy phòng học.");
+            }
+            var dupSchedule = await _dbContext.Schedules.AnyAsync(s =>
+                s.ScheduleDate == scheduleDto.ScheduleDate &&
+                s.Day == scheduleDto.Day &&
+                s.Slot == scheduleDto.Slot &&
+                s.ClassId == scheduleDto.ClassId &&
+                s.ClassroomId == scheduleDto.ClassroomId
+                );
+            if (dupSchedule)
+            {
+                return BadRequest($"Đã có lịch học trùng của lớp {scheduleDto.ClassId} lớp học {scheduleDto.ClassroomId} vào thứ {scheduleDto.Day}, ngày ({scheduleDto.ScheduleDate:yyyy-MM-dd}) ở tiết học thứ {scheduleDto.Slot}.");
             }
             schedule.Day = scheduleDto.Day;
             schedule.Slot = scheduleDto.Slot;
@@ -115,46 +144,115 @@ namespace ProjectComp1640.Controllers
 
             return NoContent();
         }
-        [HttpPost("create-recurring")]
+        [HttpPost("create-recurring-schedules")]
+        //public async Task<IActionResult> CreateRecurringSchedule(ScheduleDto scheduleDto)
+        //{
+        //    var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
+        //    if (cls == null)
+        //    { 
+        //        return NotFound("Không tìm thấy lớp học"); 
+        //    }
+        //    var clsrm = await _dbContext.Classrooms.AnyAsync(c => c.Id == scheduleDto.ClassroomId);
+        //    if (clsrm == null)
+        //    {
+        //        return NotFound($"Không tìm thấy phòng học.");
+        //    }
+        //    var current = cls.StartDate;
+        //    while (current.DayOfWeek != scheduleDto.Day)
+        //    {
+        //        current = current.AddDays(1);
+        //    }
+        //    var schedules = new List<Schedule>();
+        //    while (current <= cls.EndDate)
+        //    {
+        //        schedules.Add(new Schedule
+        //        {
+        //            ScheduleDate = current,
+        //            Day = scheduleDto.Day,
+        //            Slot = scheduleDto.Slot,
+        //            LinkMeeting = scheduleDto.LinkMeeting,
+        //            ClassId = scheduleDto.ClassId,
+        //            ClassroomId = scheduleDto.ClassroomId
+        //        });
+        //        current = current.AddDays(7);
+        //    }
+        //    _dbContext.Schedules.AddRange(schedules);
+        //    await _dbContext.SaveChangesAsync();
+        //    return Ok(schedules.Select(s => new
+        //    {
+        //        s.Id,
+        //        s.ScheduleDate,
+        //        s.Day,
+        //        s.Slot,
+        //        s.LinkMeeting,
+        //        s.ClassId,
+        //        s.ClassroomId
+        //    }));
+        //}
         public async Task<IActionResult> CreateRecurringSchedule(ScheduleDto scheduleDto)
         {
             var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
             if (cls == null)
-            { 
-                return NotFound("Class not found"); 
+            {
+                return NotFound("Không tìm thấy lớp học");
             }
+            var clsrm = await _dbContext.Classrooms.AnyAsync(c => c.Id == scheduleDto.ClassroomId);
+            if (clsrm == null)
+            {
+                return NotFound($"Không tìm thấy phòng học.");
+            }
+            var scheduleDates = new List<DateTime>();
             var current = cls.StartDate;
             while (current.DayOfWeek != scheduleDto.Day)
             {
                 current = current.AddDays(1);
             }
-            var firstWeekDate = cls.StartDate;
-            var schedules = new List<Schedule>();
             while (current <= cls.EndDate)
             {
-                schedules.Add(new Schedule
-                {
-                    ScheduleDate = current,
-                    Day = scheduleDto.Day,
-                    Slot = scheduleDto.Slot,
-                    LinkMeeting = scheduleDto.LinkMeeting,
-                    ClassId = scheduleDto.ClassId,
-                    ClassroomId = scheduleDto.ClassroomId
-                });
+                scheduleDates.Add(current);
                 current = current.AddDays(7);
             }
+            var dupSchedule = await _dbContext.Schedules.Where(
+                s => scheduleDates.Contains(s.ScheduleDate) &&
+                s.Day == scheduleDto.Day &&
+                s.Slot == scheduleDto.Slot &&
+                s.ClassId == scheduleDto.ClassId &&
+                s.ClassroomId == scheduleDto.ClassroomId)
+                .Select(s => s.ScheduleDate)
+                .ToListAsync();
+            if (dupSchedule.Any())
+            {
+                return BadRequest(new
+                    {
+                        Message = "Tồn tại lịch học trùng nên không thể tạo mới.",
+                        Conflicts = dupSchedule.Select(d => d.ToString("yyyy-MM-dd"))
+                    });
+            }
+            var schedules = scheduleDates.Select(date => new Schedule
+            {
+                ScheduleDate = date,
+                Day = scheduleDto.Day,
+                Slot = scheduleDto.Slot,
+                LinkMeeting = scheduleDto.LinkMeeting,
+                ClassId = scheduleDto.ClassId,
+                ClassroomId = scheduleDto.ClassroomId
+            }).ToList();
             _dbContext.Schedules.AddRange(schedules);
             await _dbContext.SaveChangesAsync();
-            return Ok(schedules.Select(s => new
+            return Ok(new
             {
-                s.Id,
-                s.ScheduleDate,
-                s.Day,
-                s.Slot,
-                s.LinkMeeting,
-                s.ClassId,
-                s.ClassroomId
-            }));
+                Message = "Lịch học được tạo thành công.",
+                Created = schedules.Select(s => new
+                {
+                    s.Id,
+                    s.ScheduleDate,
+                    s.Day,
+                    s.Slot,
+                    s.LinkMeeting,
+                    s.ClassId,
+                    s.ClassroomId
+                })
+            });
         }
 
     }
