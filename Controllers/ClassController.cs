@@ -82,6 +82,8 @@ namespace ProjectComp1640.Controllers
             {
                 id = c.Id,
                 TutorName = c.Tutor?.User?.FullName ?? "No Tutor",
+                TutorId = c.Tutor.Id,
+                TutorUserId = c.Tutor.UserId,
                 SubjectName = c.Subject?.SubjectName ?? "No Subject",
                 ClassName = c.ClassName,
                 TotalSlot = c.TotalSlot,
@@ -89,7 +91,8 @@ namespace ProjectComp1640.Controllers
                 EndDate = c.EndDate,
                 Description = c.Description,
                 StudentNames = c.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.User.FullName).ToList(),
-                StudentIds = c.ClassStudents.Where(cs => cs.Student?.User !=null).Select(cs => cs.Student.Id).ToList()
+                StudentIds = c.ClassStudents.Where(cs => cs.Student?.User !=null).Select(cs => cs.Student.Id).ToList(),
+                StudentUserIds = c.ClassStudents.Where(cs => cs.Student?.User !=null).Select(cs => cs.Student.UserId).ToList()
             }).ToList();
             return Ok(classDTOs);
         }
@@ -109,6 +112,8 @@ namespace ProjectComp1640.Controllers
             {
                 id = cls.Id,
                 TutorName = cls.Tutor.User.FullName,
+                TutorId = cls.Tutor.Id,
+                TutorUserId = cls.Tutor.UserId,
                 SubjectName = cls.Subject.SubjectName,
                 ClassName = cls.ClassName,
                 TotalSlot = cls.TotalSlot,
@@ -116,7 +121,8 @@ namespace ProjectComp1640.Controllers
                 EndDate = cls.EndDate,
                 Description = cls.Description,
                 StudentNames = cls.ClassStudents.Select(cs => cs.Student.User.FullName).ToList(),
-                StudentIds = cls.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.Id).ToList()
+                StudentIds = cls.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.Id).ToList(),
+                StudentUserIds = cls.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.UserId).ToList()
             };
             return Ok(classDto);
         }
