@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectComp1640.Data;
@@ -9,6 +10,7 @@ namespace ProjectComp1640.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ScheduleController : ControllerBase
     {
         private readonly ApplicationDBContext _dbContext;
@@ -17,6 +19,7 @@ namespace ProjectComp1640.Controllers
             _dbContext = dbContext;
         }
         [HttpPost("create-schedule")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateSchedule(ScheduleDto scheduleDto)
         {
             var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
@@ -54,6 +57,7 @@ namespace ProjectComp1640.Controllers
             return CreatedAtAction(nameof(GetSchedule), new { id = schedule.Id }, new { message = "Thêm lịch thành công", scheduleDto });
         }
         [HttpGet("get-all-schedules")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<GetScheduleDto>>> GetSchedules()
         {
             var schedules = await _dbContext.Schedules
@@ -73,6 +77,7 @@ namespace ProjectComp1640.Controllers
             return Ok(scheduleList);
         }
         [HttpGet("get-schedule/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<GetScheduleDto>> GetSchedule(int id)
         {
             var s = await _dbContext.Schedules
@@ -96,6 +101,7 @@ namespace ProjectComp1640.Controllers
             return Ok(dto);
         }
         [HttpPut("update-schedule/{id}")]
+        [Authorize(Roles = "Admin, Tutor")]
         public async Task<IActionResult> UpdateSchedule(int id, ScheduleDto scheduleDto)
         {
             var schedule = await _dbContext.Schedules.FindAsync(id);
@@ -103,11 +109,11 @@ namespace ProjectComp1640.Controllers
             {
                 return NotFound("Không tìm thấy lịch học này.");
             }
-            var cls = await _dbContext.Classes.FindAsync(id);
+            var cls = await _dbContext.Classes.FindAsync(scheduleDto.ClassId);
             if (cls == null) {
                 return NotFound("Không tìm thấy Lớp học.");
             }
-            var clsrm = await _dbContext.Classrooms.FindAsync(id);
+            var clsrm = await _dbContext.Classrooms.FindAsync(scheduleDto.ClassroomId);
             if (clsrm == null)
             {
                 return NotFound($"Không tìm thấy phòng học.");
@@ -123,6 +129,7 @@ namespace ProjectComp1640.Controllers
             {
                 return BadRequest($"Đã có lịch học trùng của lớp {scheduleDto.ClassId} lớp học {scheduleDto.ClassroomId} vào thứ {scheduleDto.Day}, ngày ({scheduleDto.ScheduleDate:yyyy-MM-dd}) ở tiết học thứ {scheduleDto.Slot}.");
             }
+            schedule.ScheduleDate = scheduleDto.ScheduleDate;
             schedule.Day = scheduleDto.Day;
             schedule.Slot = scheduleDto.Slot;
             schedule.LinkMeeting = scheduleDto.LinkMeeting;
@@ -132,6 +139,7 @@ namespace ProjectComp1640.Controllers
             return NoContent();
         }
         [HttpDelete("delete-schedule/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteSchedule(int id)
         {
             var schedule = await _dbContext.Schedules.FindAsync(id);
@@ -145,6 +153,7 @@ namespace ProjectComp1640.Controllers
             return NoContent();
         }
         [HttpPost("create-recurring-schedules")]
+        [Authorize(Roles = "Admin")]
         //public async Task<IActionResult> CreateRecurringSchedule(ScheduleDto scheduleDto)
         //{
         //    var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);

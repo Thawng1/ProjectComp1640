@@ -6,11 +6,13 @@ using ProjectComp1640.Data;
 using System;
 using ProjectComp1640.Dtos.Class;
 using ProjectComp1640.Dtos.Subject;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ProjectComp1640.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class SubjectsController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
