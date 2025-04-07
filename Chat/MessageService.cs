@@ -45,7 +45,7 @@ namespace ProjectComp1640.Chat
 
             _context.Messages.Add(message);
             await _context.SaveChangesAsync();
-
+            Console.WriteLine("📨 Gửi SignalR tới: " + receiverId);
             // Gửi tin nhắn đến client của người nhận
             await _hubContext.Clients.User(receiverId).SendAsync("ReceiveMessage", senderId, content);
 
