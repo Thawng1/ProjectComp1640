@@ -48,6 +48,8 @@ namespace ProjectComp1640.Chat
             Console.WriteLine("📨 Gửi SignalR tới: " + receiverId);
             // Gửi tin nhắn đến client của người nhận
             await _hubContext.Clients.User(receiverId).SendAsync("ReceiveMessage", senderId, content);
+            await _hubContext.Clients.User(senderId)
+               .SendAsync("ReceiveMessage", senderId, content);
 
             // Gửi thông báo realtime
             string notiMessage = $"📩 Bạn có tin nhắn mới từ {sender.UserName}";
