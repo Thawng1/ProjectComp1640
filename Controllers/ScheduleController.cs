@@ -25,12 +25,12 @@ namespace ProjectComp1640.Controllers
             var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
             if (cls == null)
             {
-                return NotFound("Không tìm thấy Lớp học");
+                return NotFound("Cannot find this class");
             }
             var clsrm = await _dbContext.Classrooms.AnyAsync(c => c.Id == scheduleDto.ClassroomId);
             if (!clsrm)
             {
-                return NotFound($"Không tìm thấy phòng học với ID {scheduleDto.ClassroomId}.");
+                return NotFound("Cannot find this classroom.");
             }
             var dupSchedule = await _dbContext.Schedules.AnyAsync(s =>
                 s.ScheduleDate == scheduleDto.ScheduleDate &&
@@ -41,7 +41,7 @@ namespace ProjectComp1640.Controllers
                 );
             if (dupSchedule)
             {
-                return BadRequest($"Đã có lịch học trùng của lớp {scheduleDto.ClassId} lớp học {scheduleDto.ClassroomId} vào thứ {scheduleDto.Day}, ngày ({scheduleDto.ScheduleDate:yyyy-MM-dd}) ở tiết học thứ {scheduleDto.Slot}.");
+                return BadRequest($"There is a duplicate schedule of Class {scheduleDto.ClassId} in classroom {scheduleDto.ClassroomId} at ({scheduleDto.ScheduleDate:yyyy-MM-dd}) at slot {scheduleDto.Slot}.");
             }
             var schedule = new Schedule
             {
@@ -54,7 +54,7 @@ namespace ProjectComp1640.Controllers
             };
             _dbContext.Schedules.Add(schedule);
             await _dbContext.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetSchedule), new { id = schedule.Id }, new { message = "Thêm lịch thành công", scheduleDto });
+            return CreatedAtAction(nameof(GetSchedule), new { id = schedule.Id }, new { message = "Create schedule succesfully", scheduleDto });
         }
         [HttpGet("get-all-schedules")]
         [Authorize(Roles = "Admin")]
@@ -107,16 +107,16 @@ namespace ProjectComp1640.Controllers
             var schedule = await _dbContext.Schedules.FindAsync(id);
             if (schedule == null)
             {
-                return NotFound("Không tìm thấy lịch học này.");
+                return NotFound("Cannot find this schedule");
             }
             var cls = await _dbContext.Classes.FindAsync(scheduleDto.ClassId);
             if (cls == null) {
-                return NotFound("Không tìm thấy Lớp học.");
+                return NotFound("Cannot find this class.");
             }
             var clsrm = await _dbContext.Classrooms.FindAsync(scheduleDto.ClassroomId);
             if (clsrm == null)
             {
-                return NotFound($"Không tìm thấy phòng học.");
+                return NotFound("Cannot find this classroom.");
             }
             var dupSchedule = await _dbContext.Schedules.AnyAsync(s =>
                 s.ScheduleDate == scheduleDto.ScheduleDate &&
@@ -127,7 +127,7 @@ namespace ProjectComp1640.Controllers
                 );
             if (dupSchedule)
             {
-                return BadRequest($"Đã có lịch học trùng của lớp {scheduleDto.ClassId} lớp học {scheduleDto.ClassroomId} vào thứ {scheduleDto.Day}, ngày ({scheduleDto.ScheduleDate:yyyy-MM-dd}) ở tiết học thứ {scheduleDto.Slot}.");
+                return BadRequest($"There is a duplicate schedule of Class {scheduleDto.ClassId} in classroom {scheduleDto.ClassroomId} at ({scheduleDto.ScheduleDate:yyyy-MM-dd}) at slot {scheduleDto.Slot}.");
             }
             schedule.ScheduleDate = scheduleDto.ScheduleDate;
             schedule.Day = scheduleDto.Day;
@@ -145,70 +145,26 @@ namespace ProjectComp1640.Controllers
             var schedule = await _dbContext.Schedules.FindAsync(id);
             if (schedule == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Cannot find this schedule." });
             }
             _dbContext.Schedules.Remove(schedule);
             await _dbContext.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new { message = "Delete schedule succesfully." });
         }
         [HttpPost("create-recurring-schedules")]
         [Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> CreateRecurringSchedule(ScheduleDto scheduleDto)
-        //{
-        //    var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
-        //    if (cls == null)
-        //    { 
-        //        return NotFound("Không tìm thấy lớp học"); 
-        //    }
-        //    var clsrm = await _dbContext.Classrooms.AnyAsync(c => c.Id == scheduleDto.ClassroomId);
-        //    if (clsrm == null)
-        //    {
-        //        return NotFound($"Không tìm thấy phòng học.");
-        //    }
-        //    var current = cls.StartDate;
-        //    while (current.DayOfWeek != scheduleDto.Day)
-        //    {
-        //        current = current.AddDays(1);
-        //    }
-        //    var schedules = new List<Schedule>();
-        //    while (current <= cls.EndDate)
-        //    {
-        //        schedules.Add(new Schedule
-        //        {
-        //            ScheduleDate = current,
-        //            Day = scheduleDto.Day,
-        //            Slot = scheduleDto.Slot,
-        //            LinkMeeting = scheduleDto.LinkMeeting,
-        //            ClassId = scheduleDto.ClassId,
-        //            ClassroomId = scheduleDto.ClassroomId
-        //        });
-        //        current = current.AddDays(7);
-        //    }
-        //    _dbContext.Schedules.AddRange(schedules);
-        //    await _dbContext.SaveChangesAsync();
-        //    return Ok(schedules.Select(s => new
-        //    {
-        //        s.Id,
-        //        s.ScheduleDate,
-        //        s.Day,
-        //        s.Slot,
-        //        s.LinkMeeting,
-        //        s.ClassId,
-        //        s.ClassroomId
-        //    }));
-        //}
         public async Task<IActionResult> CreateRecurringSchedule(ScheduleDto scheduleDto)
         {
             var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
             if (cls == null)
             {
-                return NotFound("Không tìm thấy lớp học");
+                return NotFound("Cannot find this class");
             }
             var clsrm = await _dbContext.Classrooms.AnyAsync(c => c.Id == scheduleDto.ClassroomId);
             if (clsrm == null)
             {
-                return NotFound($"Không tìm thấy phòng học.");
+                return NotFound("Cannot find this classroom");
             }
             var scheduleDates = new List<DateTime>();
             var current = cls.StartDate;
@@ -233,7 +189,7 @@ namespace ProjectComp1640.Controllers
             {
                 return BadRequest(new
                     {
-                        Message = "Tồn tại lịch học trùng nên không thể tạo mới.",
+                        Message = "There is an existing schedule.",
                         Conflicts = dupSchedule.Select(d => d.ToString("yyyy-MM-dd"))
                     });
             }
@@ -250,7 +206,7 @@ namespace ProjectComp1640.Controllers
             await _dbContext.SaveChangesAsync();
             return Ok(new
             {
-                Message = "Lịch học được tạo thành công.",
+                Message = "Create new schedule successfully.",
                 Created = schedules.Select(s => new
                 {
                     s.Id,

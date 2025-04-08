@@ -108,7 +108,7 @@ namespace ProjectComp1640.Controllers
                 .FirstOrDefaultAsync(c => c.Id == id);
             if (cls == null)
             {
-                return NotFound("Không tìm thấy lớp.");
+                return NotFound($"Cannot find class with ID: '{id}'.");
             }
             var classDto = new GetClassDto
             {
@@ -134,7 +134,7 @@ namespace ProjectComp1640.Controllers
             var cls = await _context.Classes.Include(c => c.ClassStudents).FirstOrDefaultAsync(c => c.Id == id);
             if (cls == null)
             {
-                return NotFound($"Class with ID '{id}' not found.");
+                return NotFound($"Cannot find class with ID: '{id}'.");
             }
             var checkClassNameExists = await _context.Classes.AnyAsync(c => c.ClassName == createClassDto.ClassName && c.Id != id);
             if (checkClassNameExists)
@@ -215,11 +215,11 @@ namespace ProjectComp1640.Controllers
             var cls = await _context.Classes.FindAsync(id);
             if (cls == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Cannot find this class." });
             }
             _context.Classes.Remove(cls);
             await _context.SaveChangesAsync();
-            return NoContent();
+            return Ok(new { message = "Delete class succesfully." });
         }
         private async Task UpdateSubjectClassesAsync(int? subjectId, Class newClass)
         {
