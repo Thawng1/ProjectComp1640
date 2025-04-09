@@ -9,9 +9,10 @@ namespace ProjectComp1640.Chat
     {
         public async Task SendMessage(string senderId, string receiverId, string content)
         {
-            await Clients.User(receiverId).SendAsync("ReceiveMessage", senderId, content);
+            var sentAt = DateTime.Now;
+            await Clients.User(receiverId).SendAsync("ReceiveMessage", senderId, content, sentAt);
 
-            await Clients.User(senderId).SendAsync("ReceiveMessage", senderId, content);
+            await Clients.User(senderId).SendAsync("ReceiveMessage", senderId, content, sentAt);
         }
 
         public override async Task OnConnectedAsync()

@@ -7,7 +7,7 @@ namespace ProjectComp1640.Interfaces
         //Task<List<Comment>> GetAllAsync(CommentQueryObject queryObject);
         Task<List<Comment>> GetAllAsync();
         Task<Comment?> GetByIdAsync(int id);
-        Task CreateAsync(Comment comment);
+        Task CreateAsync(Comment comment,string userId);
         Task<Comment?> UpdateAsync(int id, Comment commentModel);
         Task DeleteAsync(Comment comment);
         Task<IEnumerable<Comment>> GetByBlogIdAsync(int blogId);
