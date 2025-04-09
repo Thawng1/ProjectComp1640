@@ -10,7 +10,6 @@ namespace ProjectComp1640.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class ScheduleController : ControllerBase
     {
         private readonly ApplicationDBContext _dbContext;

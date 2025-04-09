@@ -10,7 +10,6 @@ namespace ProjectComp1640.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class ClassController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
@@ -19,7 +18,6 @@ namespace ProjectComp1640.Controllers
             _context = context;
         }
         [HttpPost("create-class")]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ClassDto>> CreateClass(CreateClassDto createClassDto)
         {
             var tutorUser = await _context.Users.FirstOrDefaultAsync(t => t.FullName == createClassDto.TutorName);
