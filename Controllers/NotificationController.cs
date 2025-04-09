@@ -25,8 +25,8 @@ namespace ProjectComp1640.Controllers
 
             var result = notifications.Select(n => new NotificationDto
             {
+                Id = n.Id,
                 Message = n.Message,
-                ActionUrl = n.ActionUrl,
                 CreatedAt = n.CreatedAt,
                 IsRead = n.IsRead
             }).ToList();

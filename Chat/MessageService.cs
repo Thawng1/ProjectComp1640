@@ -40,33 +40,49 @@ namespace ProjectComp1640.Chat
                 SenderId = senderId,
                 ReceiverId = receiverId,
                 Content = content,
-                SentAt = DateTime.UtcNow
+                SentAt = DateTime.Now
             };
 
             _context.Messages.Add(message);
             await _context.SaveChangesAsync();
-
+            Console.WriteLine("📨 Gửi SignalR tới: " + receiverId);
             // Gửi tin nhắn đến client của người nhận
-            await _hubContext.Clients.User(receiverId).SendAsync("ReceiveMessage", senderId, content);
+            await _hubContext.Clients.User(receiverId).SendAsync("ReceiveMessage", senderId, content, message.SentAt);
+            await _hubContext.Clients.User(senderId)
+               .SendAsync("ReceiveMessage", senderId, content, message.SentAt);
 
             // Gửi thông báo realtime
             string notiMessage = $"📩 Bạn có tin nhắn mới từ {sender.UserName}";
-            string actionUrl = $"/chat/{senderId}"; // hoặc tùy chỉnh URL hội thoại
+            
 
             await _notificationService.SendNotification(
                 receiverId,
                 notiMessage,
-                actionUrl,
                 senderId
             );
         }
         public async Task<List<Messages>> GetMessages(string senderId, string receiverId)
         {
-            return await _context.Messages
+            var messages = await _context.Messages
                 .Where(m => (m.SenderId == senderId && m.ReceiverId == receiverId) ||
                             (m.SenderId == receiverId && m.ReceiverId == senderId))
                 .OrderBy(m => m.SentAt)
                 .ToListAsync();
+            var relatedNotifications = await _context.Notifications
+                .Where(n => n.UserId == senderId &&         // người đang xem
+                            n.SenderId == receiverId &&      // người đã gửi
+                            !n.IsRead &&
+                            n.Message.Contains("tin nhắn mới"))
+                .ToListAsync();
+
+                    foreach (var noti in relatedNotifications)
+                    {
+                        noti.IsRead = true;
+                    }
+
+                    if (relatedNotifications.Count > 0)
+                        await _context.SaveChangesAsync();
+            return messages;
         }
 
         private async Task<bool> IsStudentOrTutor(AppUser user)

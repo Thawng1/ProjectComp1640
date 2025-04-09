@@ -93,7 +93,27 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
         ),
-        ValidateLifetime = true
+        ValidateLifetime = true,
+
+        NameClaimType = "nameid"
+
+    };
+    // 🛠️ THÊM middleware này để nhận token từ query string cho SignalR
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+
+            if (!string.IsNullOrEmpty(accessToken) &&
+                (path.StartsWithSegments("/MessageHub") || path.StartsWithSegments("/notificationHub")))
+            {
+                context.Token = accessToken;
+            }
+
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -156,16 +176,13 @@ app.UseRouting();
 app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseStaticFiles();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
-    endpoints.MapHub<MessageHub>("/MessageHub");  // **Thêm SignalR Hub**
+    endpoints.MapHub<MessageHub>("/MessageHub");
+    endpoints.MapHub<NotificationHub>("/notificationHub");
 });
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-    endpoints.MapHub<NotificationHub>("/notificationHub"); // Định tuyến hub riêng
-});
-app.MapControllers();
+
 app.Run();
 
