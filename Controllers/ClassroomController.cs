@@ -10,7 +10,7 @@ namespace ProjectComp1640.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    
     public class ClassroomController : ControllerBase
     {
         private readonly ApplicationDBContext _dbContext;
