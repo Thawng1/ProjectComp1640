@@ -107,7 +107,7 @@ builder.Services.AddAuthentication(options =>
             var path = context.HttpContext.Request.Path;
 
             if (!string.IsNullOrEmpty(accessToken) &&
-                path.StartsWithSegments("/MessageHub"))
+                (path.StartsWithSegments("/MessageHub") || path.StartsWithSegments("/notificationHub")))
             {
                 context.Token = accessToken;
             }
@@ -182,6 +182,6 @@ app.UseEndpoints(endpoints =>
     endpoints.MapHub<MessageHub>("/MessageHub");
     endpoints.MapHub<NotificationHub>("/notificationHub");
 });
-app.MapControllers();
+
 app.Run();
 

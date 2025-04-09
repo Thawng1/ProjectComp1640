@@ -75,19 +75,9 @@ namespace ProjectComp1640.Controllers
             if (userId == null) return Unauthorized("User not authenticated.");
 
             var comment = dto.ToCommentFromCreate(userId);
-            await _IComment.CreateAsync(comment);
+            await _IComment.CreateAsync(comment, userId);
 
-            // ✅ Gửi thông báo cho chủ blog (nếu không phải người comment)
-            var blog = await _IComment.GetBlogByIdAsync(dto.BlogId); // bạn cần tạo hàm này trong IComment
-            if (blog != null && blog.UserId != userId)
-            {
-                await _notificationService.SendNotification(
-                    receiverId: blog.UserId,
-                    senderId: userId,
-                    message: "Bài viết của bạn vừa nhận một bình luận mới.",
-                    actionUrl: $"/blogs/{dto.BlogId}"
-                );
-            }
+            
 
 
             return Ok(new { message = "Comment created successfully." });

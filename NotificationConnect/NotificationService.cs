@@ -16,23 +16,23 @@ namespace ProjectComp1640.NotificationConnect
             _hubContext = hubContext;
         }
 
-        public async Task SendNotification(string receiverId, string message, string? actionUrl = null, string? senderId = null)
+        public async Task SendNotification(string receiverId, string message, string? senderId = null)
         {
             var notification = new Notification
             {
                 UserId = receiverId,
                 SenderId = senderId,
-                Message = message,
-                ActionUrl = actionUrl
+                Message = message
             };
 
             _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
             await _hubContext.Clients.User(receiverId).SendAsync("ReceiveNotification", new
             {
+                id = notification.Id,
                 Message = message,
-                Url = actionUrl,
-                Time = notification.CreatedAt
+                Time = notification.CreatedAt,
+                senderId = senderId
             });
         }
         public async Task<List<Notification>> GetNotifications(string userId)

@@ -2,20 +2,39 @@
 using ProjectComp1640.Data;
 using ProjectComp1640.Interfaces;
 using ProjectComp1640.Model;
+using ProjectComp1640.NotificationConnect;
 
 namespace ProjectComp1640.Service
 {
     public class CommentService : IComment
     {
         public readonly ApplicationDBContext _context;
-        public CommentService(ApplicationDBContext context) 
+        private readonly NotificationService _notificationService;
+        public CommentService(ApplicationDBContext context, NotificationService notificationService) 
         { 
             _context = context;
+            _notificationService = notificationService;
         }
-        public async Task CreateAsync(Comment comment)
+        public async Task CreateAsync(Comment comment, string userId)
         {
+            comment.UserId = userId;
+
             _context.Comments.Add(comment);
             await _context.SaveChangesAsync();
+
+            var blog = await _context.Blogs.FirstOrDefaultAsync(b => b.Id == comment.BlogId);
+            if (blog != null && blog.UserId != userId)
+            {
+                var sender = await _context.Users.FindAsync(userId);
+                if (sender != null)
+                {
+                    await _notificationService.SendNotification(
+                        receiverId: blog.UserId,
+                        senderId: userId,
+                        message: $"📣 {sender.UserName} đã bình luận bài viết của bạn."
+                    );
+                }
+            }
         }
         public async Task DeleteAsync(Comment comment)
         {

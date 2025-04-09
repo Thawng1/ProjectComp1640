@@ -16,8 +16,6 @@ namespace ProjectComp1640.Model
         [Required]
         public string Message { get; set; }          // Nội dung hiển thị
 
-        public string? ActionUrl { get; set; }       // Link điều hướng khi click thông báo
-
         public bool IsRead { get; set; } = false;    // Trạng thái đã đọc
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Thời điểm tạo
