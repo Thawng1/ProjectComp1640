@@ -57,7 +57,6 @@ namespace ProjectComp1640.Controllers
             return CreatedAtAction(nameof(GetSchedule), new { id = schedule.Id }, new { message = "Create schedule succesfully", scheduleDto });
         }
         [HttpGet("get-all-schedules")]
-        [Authorize]
         public async Task<ActionResult<IEnumerable<GetScheduleDto>>> GetSchedules()
         {
             var schedules = await _dbContext.Schedules
@@ -78,7 +77,6 @@ namespace ProjectComp1640.Controllers
             return Ok(scheduleList);
         }
         [HttpGet("get-schedule/{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<GetScheduleDto>> GetSchedule(int id)
         {
             var s = await _dbContext.Schedules
@@ -103,7 +101,6 @@ namespace ProjectComp1640.Controllers
             return Ok(dto);
         }
         [HttpPut("update-schedule/{id}")]
-        [Authorize(Roles = "Admin, Tutor")]
         public async Task<IActionResult> UpdateSchedule(int id, ScheduleDto scheduleDto)
         {
             var schedule = await _dbContext.Schedules.FindAsync(id);
@@ -141,7 +138,6 @@ namespace ProjectComp1640.Controllers
             return NoContent();
         }
         [HttpDelete("delete-schedule/{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteSchedule(int id)
         {
             var schedule = await _dbContext.Schedules.FindAsync(id);
@@ -155,7 +151,6 @@ namespace ProjectComp1640.Controllers
             return Ok(new { message = "Delete schedule succesfully." });
         }
         [HttpPost("create-recurring-schedules")]
-        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> CreateRecurringSchedule(ScheduleDto scheduleDto)
         {
