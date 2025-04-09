@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectComp1640.Data;
@@ -36,7 +37,7 @@ namespace ProjectComp1640.Controllers
             var classroom = await _dbContext.Classrooms.FindAsync(id);
             if (classroom == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Cannot find this classroom." });
             }
             return classroom;
         }
@@ -61,8 +62,8 @@ namespace ProjectComp1640.Controllers
         {
             var classroom = await _dbContext.Classrooms.FindAsync(id);
             if (classroom == null)
-            {  
-                return NotFound();
+            {
+                return NotFound(new { message = "Cannot find this classroom." });
             }
             classroom.Name = classroomDto.Name;
             await _dbContext.SaveChangesAsync();
@@ -75,15 +76,11 @@ namespace ProjectComp1640.Controllers
             var classroom = await _dbContext.Classrooms.FindAsync(id);
             if (classroom == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Cannot find this classroom." });
             }
             _dbContext.Classrooms.Remove(classroom);
             await _dbContext.SaveChangesAsync();
-            return NoContent();
-        }
-        private bool ClassroomExists(int id)
-        {
-            return _dbContext.Classrooms.Any(e => e.Id == id);
+            return Ok(new { message = "Delete classroom succesfully." });
         }
     }
 }
