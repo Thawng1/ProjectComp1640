@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectComp1640.Data;
@@ -9,6 +10,7 @@ namespace ProjectComp1640.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize(Roles = "Admin")]
     public class ClassController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
@@ -82,15 +84,15 @@ namespace ProjectComp1640.Controllers
             {
                 id = c.Id,
                 TutorName = c.Tutor?.User?.FullName ?? "No Tutor",
-                TutorId = c.Tutor.Id,
-                TutorUserId = c.Tutor.UserId,
+                TutorId = c.Tutor?.Id,
+                TutorUserId = c.Tutor?.UserId,
                 SubjectName = c.Subject?.SubjectName ?? "No Subject",
                 ClassName = c.ClassName,
                 TotalSlot = c.TotalSlot,
                 StartDate = c.StartDate,
                 EndDate = c.EndDate,
                 Description = c.Description,
-                StudentNames = c.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.User.FullName).ToList(),
+                StudentNames = c.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.User.FullName).DefaultIfEmpty("No Students").ToList(),
                 StudentIds = c.ClassStudents.Where(cs => cs.Student?.User !=null).Select(cs => cs.Student.Id).ToList(),
                 StudentUserIds = c.ClassStudents.Where(cs => cs.Student?.User !=null).Select(cs => cs.Student.UserId).ToList()
             }).ToList();
@@ -106,21 +108,21 @@ namespace ProjectComp1640.Controllers
                 .FirstOrDefaultAsync(c => c.Id == id);
             if (cls == null)
             {
-                return NotFound("Không tìm thấy lớp.");
+                return NotFound($"Cannot find class with ID: '{id}'.");
             }
             var classDto = new GetClassDto
             {
                 id = cls.Id,
-                TutorName = cls.Tutor.User.FullName,
-                TutorId = cls.Tutor.Id,
-                TutorUserId = cls.Tutor.UserId,
+                TutorName = cls.Tutor?.User?.FullName ?? "No Tutor",
+                TutorId = cls.Tutor?.Id,
+                TutorUserId = cls.Tutor?.UserId,
                 SubjectName = cls.Subject.SubjectName,
                 ClassName = cls.ClassName,
                 TotalSlot = cls.TotalSlot,
                 StartDate = cls.StartDate,
                 EndDate = cls.EndDate,
                 Description = cls.Description,
-                StudentNames = cls.ClassStudents.Select(cs => cs.Student.User.FullName).ToList(),
+                StudentNames = cls.ClassStudents.Select(cs => cs.Student.User.FullName).DefaultIfEmpty("No Students").ToList(),
                 StudentIds = cls.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.Id).ToList(),
                 StudentUserIds = cls.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.UserId).ToList()
             };
@@ -132,7 +134,7 @@ namespace ProjectComp1640.Controllers
             var cls = await _context.Classes.Include(c => c.ClassStudents).FirstOrDefaultAsync(c => c.Id == id);
             if (cls == null)
             {
-                return NotFound($"Class with ID '{id}' not found.");
+                return NotFound($"Cannot find class with ID: '{id}'.");
             }
             var checkClassNameExists = await _context.Classes.AnyAsync(c => c.ClassName == createClassDto.ClassName && c.Id != id);
             if (checkClassNameExists)
@@ -213,11 +215,11 @@ namespace ProjectComp1640.Controllers
             var cls = await _context.Classes.FindAsync(id);
             if (cls == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Cannot find this class." });
             }
             _context.Classes.Remove(cls);
             await _context.SaveChangesAsync();
-            return NoContent();
+            return Ok(new { message = "Delete class succesfully." });
         }
         private async Task UpdateSubjectClassesAsync(int? subjectId, Class newClass)
         {

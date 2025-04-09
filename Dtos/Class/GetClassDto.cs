@@ -3,10 +3,10 @@
     public class GetClassDto
     {
         public int id { get; set; }
-        public string TutorName { get; set; }
-        public int TutorId { get; set; }
-        public string TutorUserId { get; set; }
-        public string SubjectName { get; set; }
+        public string? TutorName { get; set; }
+        public int? TutorId { get; set; }
+        public string? TutorUserId { get; set; }
+        public string? SubjectName { get; set; }
         public string ClassName { get; set; }
         public int TotalSlot { get; set; }
         public DateTime StartDate { get; set; }
