@@ -29,6 +29,7 @@ namespace ProjectComp1640.Controllers
                 ToListAsync();
             var subjectDtos = subjects.Select(s => new GetSubjectDto
             {
+                Id = s.Id,
                 SubjectName = s.SubjectName,
                 Information = s.Information,
                 Classes = s.Classes.Select(c => new CreateClassDto
@@ -58,6 +59,7 @@ namespace ProjectComp1640.Controllers
             }
             var subjectDto = new GetSubjectDto
             {
+                Id = subject.Id,
                 SubjectName = subject.SubjectName,
                 Information = subject.Information,
                 Classes = subject.Classes.Select(c => new CreateClassDto
