@@ -41,6 +41,11 @@ namespace ProjectComp1640.Controllers
             {
                 return BadRequest("Number of total slots must be greater than 0.");
             }
+            var checkClassNameExists = await _context.Classes.AnyAsync(c => c.ClassName == createClassDto.ClassName);
+            if (checkClassNameExists)
+            {
+                return BadRequest($"Class name '{createClassDto.ClassName}' is already taken.");
+            }
             var classStudents = new List<ClassStudent>();
             foreach (var studentName in createClassDto.StudentNames)
             {

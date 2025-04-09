@@ -12,7 +12,7 @@ namespace ProjectComp1640.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    
     public class SubjectsController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
@@ -34,7 +34,7 @@ namespace ProjectComp1640.Controllers
                 Information = s.Information,
                 Classes = s.Classes.Select(c => new CreateClassDto
                 {
-                    TutorName = c.Tutor.User.FullName ?? "No Tutor",
+                    TutorName = c.Tutor?.User?.FullName ?? "No Tutor",
                     SubjectName = c.Subject.SubjectName ?? "No Subject",
                     ClassName = c.ClassName,
                     TotalSlot = c.TotalSlot,
