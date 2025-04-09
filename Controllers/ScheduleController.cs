@@ -153,36 +153,28 @@ namespace ProjectComp1640.Controllers
 
         public async Task<IActionResult> CreateRecurringSchedule(ScheduleDto scheduleDto)
         {
-            // ✅ Tìm lớp học
             var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
             if (cls == null)
             { 
                 return NotFound("Cannot find this class");
             }
-
-            // ✅ Tìm phòng học
             var clsrmExists = await _dbContext.Classrooms.AnyAsync(c => c.Id == scheduleDto.ClassroomId);
             if (!clsrmExists)
             {
                 return NotFound("Cannot find this classroom");
             }
-
-            // ✅ Validate scheduleDate đã nằm trong khoảng thời gian cho phép
             if (scheduleDto.ScheduleDate < cls.StartDate || scheduleDto.ScheduleDate > cls.EndDate)
             {
-                return BadRequest("Ngày bắt đầu lặp không nằm trong khoảng thời gian của lớp học.");
+                return BadRequest("Recurring start date must be inside the class study time");
             }
-
-            // ✅ Tính các ngày lặp từ ngày được gửi lên
             var scheduleDates = new List<DateTime>();
             var current = scheduleDto.ScheduleDate.Date;
 
             while (current <= cls.EndDate.Date)
             {
                 scheduleDates.Add(current);
-                current = current.AddDays(7); // Lặp lại mỗi tuần
+                current = current.AddDays(7);
             }
-            // ✅ Kiểm tra trùng lịch
             var dupSchedule = await _dbContext.Schedules
                 .Where(s => scheduleDates.Contains(s.ScheduleDate) &&
                             s.Day == scheduleDto.Day &&
@@ -191,17 +183,10 @@ namespace ProjectComp1640.Controllers
                             s.ClassroomId == scheduleDto.ClassroomId)
                 .Select(s => s.ScheduleDate)
                 .ToListAsync();
-
             if (dupSchedule.Any())
             {
-                return BadRequest(new
-                {
-                    Message = "Tồn tại lịch học trùng nên không thể tạo mới.",
-                    Conflicts = dupSchedule.Select(d => d.ToString("yyyy-MM-dd"))
-                });
+                return BadRequest($"There is a duplicate schedule of Class {scheduleDto.ClassId} in classroom {scheduleDto.ClassroomId} at ({scheduleDto.ScheduleDate:yyyy-MM-dd}) at slot {scheduleDto.Slot}.");
             }
-
-            // ✅ Tạo danh sách lịch
             var schedules = scheduleDates.Select(date => new Schedule
             {
                 ScheduleDate = date,
@@ -211,10 +196,8 @@ namespace ProjectComp1640.Controllers
                 ClassId = scheduleDto.ClassId,
                 ClassroomId = scheduleDto.ClassroomId
             }).ToList();
-
             _dbContext.Schedules.AddRange(schedules);
             await _dbContext.SaveChangesAsync();
-
             return Ok(new
             {
                 Message = "Create new schedule successfully.",
