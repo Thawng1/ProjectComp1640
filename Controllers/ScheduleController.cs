@@ -154,19 +154,12 @@ namespace ProjectComp1640.Controllers
 
             return Ok(new { message = "Delete schedule succesfully." });
         }
-
-
-
-
-
-
-
-
-
         [HttpPost("create-recurring-schedules")]
         [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> CreateRecurringSchedule(ScheduleDto scheduleDto)
         {
+            // ✅ Tìm lớp học
             var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
             if (cls == null)
             { 
@@ -189,6 +182,7 @@ namespace ProjectComp1640.Controllers
             // ✅ Tính các ngày lặp từ ngày được gửi lên
             var scheduleDates = new List<DateTime>();
             var current = scheduleDto.ScheduleDate.Date;
+
             while (current <= cls.EndDate.Date)
             {
                 scheduleDates.Add(current);
@@ -207,10 +201,10 @@ namespace ProjectComp1640.Controllers
             if (dupSchedule.Any())
             {
                 return BadRequest(new
-                    {
-                        Message = "Tồn tại lịch học trùng nên không thể tạo mới.",
-                        Conflicts = dupSchedule.Select(d => d.ToString("yyyy-MM-dd"))
-                    });
+                {
+                    Message = "Tồn tại lịch học trùng nên không thể tạo mới.",
+                    Conflicts = dupSchedule.Select(d => d.ToString("yyyy-MM-dd"))
+                });
             }
 
             // ✅ Tạo danh sách lịch
