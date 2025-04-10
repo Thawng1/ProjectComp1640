@@ -10,6 +10,7 @@ using ProjectComp1640.Model;
 using ProjectComp1640.NotificationConnect;
 using ProjectComp1640.Service;
 using System.Text;
+using Microsoft.Azure.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -125,12 +126,14 @@ builder.Services.AddCors(options =>
     options.AddPolicy("CorsPolicy", builder =>
     {
         builder
+            .WithOrigins("https://victorious-smoke-0d0ea8a00.6.azurestaticapps.net") // ✅ domain FE
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .AllowCredentials()
-            .SetIsOriginAllowed(origin => true); // Cho phép tất cả domain
+            .AllowCredentials();
     });
 });
+builder.Services.AddSignalR().AddAzureSignalR(builder.Configuration["Azure:SignalR:ConnectionString"]!);
+
 
 var app = builder.Build();
 
