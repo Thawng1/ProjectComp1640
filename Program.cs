@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProjectComp1640.Chat;
+using ProjectComp1640.Dashboard;
 using ProjectComp1640.Data;
 using ProjectComp1640.Interfaces;
 using ProjectComp1640.Model;
@@ -182,6 +183,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
     endpoints.MapHub<MessageHub>("/MessageHub");
     endpoints.MapHub<NotificationHub>("/notificationHub");
+    endpoints.MapHub<DashboardHub>("/dashboardHub");
 });
 
 app.Run();
