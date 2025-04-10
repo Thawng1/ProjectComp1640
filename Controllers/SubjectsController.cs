@@ -6,6 +6,7 @@ using ProjectComp1640.Data;
 using System;
 using ProjectComp1640.Dtos.Class;
 using ProjectComp1640.Dtos.Subject;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ProjectComp1640.Controllers
 {
@@ -27,12 +28,13 @@ namespace ProjectComp1640.Controllers
                 ToListAsync();
             var subjectDtos = subjects.Select(s => new GetSubjectDto
             {
+                Id = s.Id,
                 SubjectName = s.SubjectName,
                 Information = s.Information,
                 Classes = s.Classes.Select(c => new CreateClassDto
                 {
-                    TutorName = c.Tutor.User.FullName ?? "Không có giáo viên",
-                    SubjectName = c.Subject.SubjectName ?? "Không có môn học",
+                    TutorName = c.Tutor?.User?.FullName ?? "No Tutor",
+                    SubjectName = c.Subject.SubjectName ?? "No Subject",
                     ClassName = c.ClassName,
                     TotalSlot = c.TotalSlot,
                     StartDate = c.StartDate,
@@ -52,16 +54,17 @@ namespace ProjectComp1640.Controllers
                 .FirstOrDefaultAsync(s => s.Id == id);
             if (subject == null)
             {
-                return NotFound($"Không tìm thấy môn học với ID '{id}'.");
+                return NotFound("Cannot find this subject.");
             }
             var subjectDto = new GetSubjectDto
             {
+                Id = subject.Id,
                 SubjectName = subject.SubjectName,
                 Information = subject.Information,
                 Classes = subject.Classes.Select(c => new CreateClassDto
                 {
-                    TutorName = c.Tutor.User.FullName ?? "Không có giáo viên",
-                    SubjectName = c.Subject.SubjectName ?? "Không có môn học",
+                    TutorName = c.Tutor.User.FullName ?? "No Tutor",
+                    SubjectName = c.Subject.SubjectName ?? "No Subject",
                     ClassName = c.ClassName,
                     TotalSlot = c.TotalSlot,
                     StartDate = c.StartDate,
@@ -82,7 +85,7 @@ namespace ProjectComp1640.Controllers
             };
             _context.Subjects.Add(newSubject);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetSubject), new { id = newSubject.Id }, new { message = "Tạo môn thành công.", subjectDto });
+            return CreatedAtAction(nameof(GetSubject), new { id = newSubject.Id }, new { message = "Create subject successfully.", subjectDto });
         }
         [HttpPut("update-subject/{id}")]
         public async Task<IActionResult> UpdateSubject(int id, SubjectDto subjectDto)
@@ -98,14 +101,14 @@ namespace ProjectComp1640.Controllers
             {
                 if (!_context.Subjects.Any(s => s.Id == id))
                 {
-                    return NotFound(new { message = "Không tìm thấy môn học này." });
+                    return NotFound(new { message = "Cannot find this subject." });
                 }
                 else
                 {
                     throw;
                 }
             }
-            return Ok(new { message = "Cập nhật môn thành công." });
+            return Ok(new { message = "Update subject successfully." });
         }
         [HttpDelete("delete-subject/{id}")]
         public async Task<IActionResult> DeleteSubject(int id)
@@ -113,11 +116,11 @@ namespace ProjectComp1640.Controllers
             var subject = await _context.Subjects.FindAsync(id);
             if (subject == null)
             {
-                return NotFound(new { message = "Không tìm thấy môn học này." });
+                return NotFound(new { message = "Cannot find this subject." });
             }
             _context.Subjects.Remove(subject);
             await _context.SaveChangesAsync();
-            return Ok(new { message = "Xóa môn thành công." });
+            return Ok(new { message = "Delete subject succesfully." });
         }
     }
 }
