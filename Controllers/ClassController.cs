@@ -86,6 +86,7 @@ namespace ProjectComp1640.Controllers
                 .Include(c => c.Tutor).ThenInclude(t => t.User)
                 .Include(c => c.Subject)
                 .Include(c => c.ClassStudents).ThenInclude(cs => cs.Student).ThenInclude(s => s.User)
+                .Include(c => c.Schedules)
                 .ToListAsync();
             var classDTOs = classes.Select(c => new GetClassDto
             {
@@ -101,7 +102,8 @@ namespace ProjectComp1640.Controllers
                 Description = c.Description,
                 StudentNames = c.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.User.FullName).DefaultIfEmpty("No Students").ToList(),
                 StudentIds = c.ClassStudents.Where(cs => cs.Student?.User !=null).Select(cs => cs.Student.Id).ToList(),
-                StudentUserIds = c.ClassStudents.Where(cs => cs.Student?.User !=null).Select(cs => cs.Student.UserId).ToList()
+                StudentUserIds = c.ClassStudents.Where(cs => cs.Student?.User !=null).Select(cs => cs.Student.UserId).ToList(),
+                ScheduleIds = c.Schedules.Where(s => s.Id != null).Select(s => s.Id).ToList()
             }).ToList();
             return Ok(classDTOs);
         }
@@ -112,6 +114,7 @@ namespace ProjectComp1640.Controllers
                 .Include(c => c.Subject)
                 .Include(c => c.Tutor.User)
                 .Include(c => c.ClassStudents).ThenInclude(cs => cs.Student.User)
+                .Include(c => c.Schedules)
                 .FirstOrDefaultAsync(c => c.Id == id);
             if (cls == null)
             {
@@ -131,7 +134,8 @@ namespace ProjectComp1640.Controllers
                 Description = cls.Description,
                 StudentNames = cls.ClassStudents.Select(cs => cs.Student.User.FullName).DefaultIfEmpty("No Students").ToList(),
                 StudentIds = cls.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.Id).ToList(),
-                StudentUserIds = cls.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.UserId).ToList()
+                StudentUserIds = cls.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.UserId).ToList(),
+                ScheduleIds = cls.Schedules.Where(s => s.Id != null).Select(s => s.Id).ToList()
             };
             return Ok(classDto);
         }
@@ -227,6 +231,11 @@ namespace ProjectComp1640.Controllers
             if (cls == null)
             {
                 return NotFound(new { message = "Cannot find this class." });
+            }
+            var checkClassSchedule = await _context.Classes.Include(c => c.Schedules).FirstOrDefaultAsync(c => c.Id == id);
+            if(checkClassSchedule.Schedules != null && checkClassSchedule.Schedules.Any())
+            {
+                _context.Schedules.RemoveRange(checkClassSchedule.Schedules);
             }
             _context.Classes.Remove(cls);
             await _context.SaveChangesAsync();
