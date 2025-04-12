@@ -217,7 +217,7 @@ namespace ProjectComp1640.Controllers
                     throw;
                 }
             }
-            return NoContent();
+            return Ok("Class updated successfully");
         }
 
         [HttpDelete("delete-class/{id}")]

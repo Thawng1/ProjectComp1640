@@ -12,6 +12,7 @@ namespace ProjectComp1640.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize("Admin")]
     public class SubjectsController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
@@ -117,6 +118,16 @@ namespace ProjectComp1640.Controllers
             if (subject == null)
             {
                 return NotFound(new { message = "Cannot find this subject." });
+            }
+            var sbjcls = await _context.Subjects.Include(s => s.Classes).FirstOrDefaultAsync();
+            var classes = subject.Classes.Select(c => c.ClassName).ToList();
+            if (subject.Classes != null)
+            {
+                return BadRequest(new
+                {
+                    message = "This subject currently being used by one or more classes.",
+                    classes
+                });
             }
             _context.Subjects.Remove(subject);
             await _context.SaveChangesAsync();
