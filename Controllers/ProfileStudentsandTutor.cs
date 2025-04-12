@@ -183,7 +183,11 @@ namespace ProjectComp1640.Controllers
             {
                 _context.Users.Remove(student.User);
             }
-
+            var checkClassStudent = await _context.ClassStudents.AnyAsync(c => c.StudentId == id);
+            if(checkClassStudent)
+            {
+                return BadRequest("Cannot delete this student because they are currently enrolled to one or more classes.");
+            }
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();
             return Ok(new { Message = "Student deleted successfully!" });
@@ -195,7 +199,11 @@ namespace ProjectComp1640.Controllers
         {
             var tutor = await _context.Tutors.Include(t => t.User).FirstOrDefaultAsync(t => t.Id == id);
             if (tutor == null) return NotFound("Tutor not found!");
-
+            var checkClassTutor = await _context.Classes.AnyAsync(c => c.TutorId == id);
+            if (checkClassTutor)
+            {
+                return BadRequest("Cannot delete this tutor because they are currently assigned to one or more classes.");
+            }
             if (tutor.User != null)
             {
                 _context.Users.Remove(tutor.User);
