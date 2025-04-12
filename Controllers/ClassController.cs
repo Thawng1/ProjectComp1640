@@ -32,7 +32,10 @@ namespace ProjectComp1640.Controllers
                 return NotFound($"Cannot found subject with name '{createClassDto.SubjectName}'");
             }
             var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Id == subjectName.Id);
-            if (createClassDto.EndDate < createClassDto.StartDate)
+            if (createClassDto.StartDate < DateTime.Now)
+            {
+                return BadRequest("Start date cannot be in the past");
+            } else if (createClassDto.EndDate < createClassDto.StartDate)
             {
                 return BadRequest("End date cannot be earlier than start date.");
             }
@@ -170,7 +173,11 @@ namespace ProjectComp1640.Controllers
                 var tutor = await _context.Tutors.FirstOrDefaultAsync(t => t.UserId == tutorUser.Id);
                 cls.TutorId = tutor.Id;
             }
-            if (createClassDto.EndDate < createClassDto.StartDate)
+            if (createClassDto.StartDate < DateTime.Now)
+            {
+                return BadRequest("Start date cannot be in the past");
+            }
+            else if (createClassDto.EndDate < createClassDto.StartDate)
             {
                 return BadRequest("End date cannot be earlier than start date.");
             }

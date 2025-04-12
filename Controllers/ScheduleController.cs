@@ -31,6 +31,10 @@ namespace ProjectComp1640.Controllers
             {
                 return NotFound("Cannot find this classroom.");
             }
+            if (scheduleDto.ScheduleDate < cls.StartDate ||  scheduleDto.ScheduleDate > cls.EndDate)
+            {
+                return BadRequest($"Schedule must be created between the class time: From {cls.StartDate} to {cls.EndDate}");
+            }
             var dupSchedule = await _dbContext.Schedules.AnyAsync(s =>
                 s.ScheduleDate == scheduleDto.ScheduleDate &&
                 s.Day == scheduleDto.Day &&
