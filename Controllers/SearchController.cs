@@ -31,14 +31,13 @@ namespace ProjectComp1640.Controllers
                 .Include(c => c.ClassStudents).ThenInclude(cs => cs.Student).ThenInclude(s => s.User)
                 .Where(c => c.ClassName.ToLower().Contains(lowerQuery))
                 .ToListAsync();
-
             var classDtos = matchedClasses.Select(c => new GetClassDto
             {
                 id = c.Id,
                 TutorName = c.Tutor?.User?.FullName ?? "No Tutor",
-                TutorId = c.Tutor.Id,
-                TutorUserId = c.Tutor.UserId,
-                SubjectName = c.Subject.SubjectName,
+                TutorId = c.Tutor?.Id,
+                TutorUserId = c.Tutor?.UserId,
+                SubjectName = c.Subject?.SubjectName,
                 ClassName = c.ClassName,
                 TotalSlot = c.TotalSlot,
                 StartDate = c.StartDate,
@@ -48,7 +47,6 @@ namespace ProjectComp1640.Controllers
                 StudentIds = c.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.Id).ToList(),
                 StudentUserIds = c.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.UserId).ToList()
             }).ToList();
-
             var matchedBlogs = await _context.Blogs
                 .Include(b => b.User)
                 .Include(b => b.Comments)
@@ -56,14 +54,15 @@ namespace ProjectComp1640.Controllers
                     b.Title.ToLower().Contains(lowerQuery) ||
                     b.Content.ToLower().Contains(lowerQuery))
                 .ToListAsync();
-
             var blogDtos = matchedBlogs.Select(b => new GetBlogDto
             {
                 Id = b.Id,
                 Title = b.Title,
-                ShortContent = b.Content?.Length > 100 ? b.Content.Substring(0, 100) + "..." : b.Content,
-                UserName = b.User.FullName,
+                Url = b.Url,
+                Content = b.Content,
                 UserId = b.UserId,
+                CreatedAt = b.CreatedAt,
+                CommentIds = b.Comments.Select(b => b.Id).ToList(),
             }).ToList();
 
             return Ok(new SearchDto
