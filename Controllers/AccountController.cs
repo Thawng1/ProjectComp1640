@@ -7,6 +7,7 @@ using ProjectComp1640.Dtos.Account;
 using ProjectComp1640.Interfaces;
 using ProjectComp1640.Model;
 using System;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -175,6 +176,7 @@ namespace ProjectComp1640.Controllers
                 return StatusCode(500, "An error occurred while saving data: " + ex.Message);
             }
         }
+
         private async Task SendEmailRegister(string email)
         {
             if (string.IsNullOrEmpty(email))
@@ -182,12 +184,27 @@ namespace ProjectComp1640.Controllers
                 return;
             }
 
-            string subject = "Register successfully";
-            string body = "<p>Bạn đã được đăng kí tài khoản thành công. Nhấp vào link dưới để đổi mật khẩu:</p>" +
-                          "<a href='https://yourapp.com/reset-password'>Đặt lại mật khẩu</a>";
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return;
+            }
+
+            // Tạo token đặt lại mật khẩu
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var encodedToken = WebUtility.UrlEncode(token);
+
+            // Đường dẫn frontend kèm email + token
+            string resetLink = $"https://victorious-smoke-0d0ea8a00.6.azurestaticapps.net/reset-password?email={email}&token={encodedToken}";
+
+            string subject = "Đăng ký thành công";
+            string body = "<p>Bạn đã được đăng ký tài khoản thành công.</p>" +
+                          "<p>Vui lòng nhấp vào liên kết dưới đây để đặt mật khẩu của bạn:</p>" +
+                          $"<a href='{resetLink}'>Đặt lại mật khẩu</a>";
 
             await _emailService.SendEmailAsync(email, subject, body);
         }
+
 
         [Authorize] // Yêu cầu người dùng đã đăng nhập mới có thể gọi API này
         [HttpPost("logout")]
