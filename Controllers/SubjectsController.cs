@@ -12,7 +12,7 @@ namespace ProjectComp1640.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize("Admin")]
+    [Authorize(Roles = "Admin")]
     public class SubjectsController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
@@ -121,7 +121,7 @@ namespace ProjectComp1640.Controllers
             }
             var sbjcls = await _context.Subjects.Include(s => s.Classes).FirstOrDefaultAsync();
             var classes = subject.Classes.Select(c => c.ClassName).ToList();
-            if (subject.Classes != null)
+            if (subject.Classes != null && subject.Classes.Any())
             {
                 return BadRequest(new
                 {
