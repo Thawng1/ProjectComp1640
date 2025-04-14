@@ -47,13 +47,13 @@ namespace ProjectComp1640.Controllers
 
             var username = loginDto.Username?.ToLower();
             if (string.IsNullOrEmpty(username))
-                return BadRequest("Username is required.");
+                return BadRequest(new{ message = "Username is required." });
 
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == username);
-            if (user == null) return Unauthorized("Invalid username!");
+            if (user == null) return Unauthorized(new { message = "Invalid username!" });
 
             var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-            if (!result.Succeeded) return Unauthorized("Invalid username or password!");
+            if (!result.Succeeded) return Unauthorized(new { message = "Invalid username or password!" });
 
             return Ok(new NewUserDto
             {

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectComp1640.Data;
 using ProjectComp1640.Dtos.Account;
+using ProjectComp1640.Model;
+using System.Linq;
 using System.Security.Claims;
 
 namespace ProjectComp1640.Controllers
@@ -21,8 +23,8 @@ namespace ProjectComp1640.Controllers
         [HttpGet("students")]
         public async Task<IActionResult> GetStudents()
         {
-            if(_context.Students.Any())
-            {
+            //if(_context.Students.Any())
+            //{
                 var students = await _context.Students
                 .Include(s => s.User)
                 .Select(s => new {
@@ -35,9 +37,9 @@ namespace ProjectComp1640.Controllers
                 .ToListAsync();
 
                 return Ok(students);
-               
-            }
-            return BadRequest("Student not found");
+
+        //}
+            //return BadRequest("Student not found");
         }
         [Authorize] 
         [HttpGet("students/{id}")]
@@ -183,7 +185,23 @@ namespace ProjectComp1640.Controllers
             {
                 _context.Users.Remove(student.User);
             }
-
+            var checkClassStudent = await _context.ClassStudents.AnyAsync(c => c.StudentId == id);
+            if(checkClassStudent)
+            {
+                return BadRequest("Cannot delete this student because they are currently enrolled to one or more classes.");
+            }
+            var getUserId = student.UserId;
+            var userNotification = await _context.Notifications.Where(n => n.UserId == getUserId || n.SenderId == getUserId).ToListAsync();
+            var userBlog = await _context.Blogs.Where(b => b.UserId == getUserId).ToListAsync();
+            var userBlogIds = userBlog.Select(b => b?.Id).ToList();
+            var commentsToDelete = await _context.Comments.Where(c => userBlogIds.Contains(c.BlogId)).ToListAsync();
+            var userComment = await _context.Comments.Where(c => c.UserId == getUserId).ToListAsync();
+            var relatedMessages = await _context.Messages.Where(m => m.SenderId == getUserId || m.ReceiverId == getUserId).ToListAsync();
+            _context.Notifications.RemoveRange(userNotification);
+            _context.Comments.RemoveRange(userComment);
+            _context.Comments.RemoveRange(commentsToDelete);
+            _context.Blogs.RemoveRange(userBlog);
+            _context.Messages.RemoveRange(relatedMessages);
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();
             return Ok(new { Message = "Student deleted successfully!" });
@@ -195,7 +213,23 @@ namespace ProjectComp1640.Controllers
         {
             var tutor = await _context.Tutors.Include(t => t.User).FirstOrDefaultAsync(t => t.Id == id);
             if (tutor == null) return NotFound("Tutor not found!");
-
+            var checkClassTutor = await _context.Classes.AnyAsync(c => c.TutorId == id);
+            var getUserId = tutor.UserId;
+            var userNotification = await _context.Notifications.Where(n => n.UserId == getUserId || n.SenderId == getUserId).ToListAsync();
+            var userBlog = await _context.Blogs.Where(b => b.UserId == getUserId).ToListAsync();
+            var userBlogIds = userBlog.Select(b => b?.Id).ToList();
+            var commentsToDelete = await _context.Comments.Where(c => userBlogIds.Contains(c.BlogId)).ToListAsync();
+            var userComment = await _context.Comments.Where(c => c.UserId == getUserId).ToListAsync();
+            var relatedMessages = await _context.Messages.Where(m => m.SenderId == getUserId || m.ReceiverId == getUserId).ToListAsync();
+            _context.Notifications.RemoveRange(userNotification);
+            _context.Comments.RemoveRange(userComment);
+            _context.Comments.RemoveRange(commentsToDelete);
+            _context.Blogs.RemoveRange(userBlog);
+            _context.Messages.RemoveRange(relatedMessages);
+            if (checkClassTutor)
+            {
+                return BadRequest("Cannot delete this tutor because they are currently assigned to one or more classes.");
+            }
             if (tutor.User != null)
             {
                 _context.Users.Remove(tutor.User);

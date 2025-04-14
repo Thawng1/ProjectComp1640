@@ -32,7 +32,10 @@ namespace ProjectComp1640.Controllers
                 return NotFound($"Cannot found subject with name '{createClassDto.SubjectName}'");
             }
             var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Id == subjectName.Id);
-            if (createClassDto.EndDate < createClassDto.StartDate)
+            if (createClassDto.StartDate < DateTime.Now)
+            {
+                return BadRequest("Start date cannot be in the past");
+            } else if (createClassDto.EndDate < createClassDto.StartDate)
             {
                 return BadRequest("End date cannot be earlier than start date.");
             }
@@ -83,6 +86,7 @@ namespace ProjectComp1640.Controllers
                 .Include(c => c.Tutor).ThenInclude(t => t.User)
                 .Include(c => c.Subject)
                 .Include(c => c.ClassStudents).ThenInclude(cs => cs.Student).ThenInclude(s => s.User)
+                .Include(c => c.Schedules)
                 .ToListAsync();
             var classDTOs = classes.Select(c => new GetClassDto
             {
@@ -98,7 +102,8 @@ namespace ProjectComp1640.Controllers
                 Description = c.Description,
                 StudentNames = c.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.User.FullName).DefaultIfEmpty("No Students").ToList(),
                 StudentIds = c.ClassStudents.Where(cs => cs.Student?.User !=null).Select(cs => cs.Student.Id).ToList(),
-                StudentUserIds = c.ClassStudents.Where(cs => cs.Student?.User !=null).Select(cs => cs.Student.UserId).ToList()
+                StudentUserIds = c.ClassStudents.Where(cs => cs.Student?.User !=null).Select(cs => cs.Student.UserId).ToList(),
+                ScheduleIds = c.Schedules.Where(s => s.Id != null).Select(s => s.Id).ToList()
             }).ToList();
             return Ok(classDTOs);
         }
@@ -109,6 +114,7 @@ namespace ProjectComp1640.Controllers
                 .Include(c => c.Subject)
                 .Include(c => c.Tutor.User)
                 .Include(c => c.ClassStudents).ThenInclude(cs => cs.Student.User)
+                .Include(c => c.Schedules)
                 .FirstOrDefaultAsync(c => c.Id == id);
             if (cls == null)
             {
@@ -128,7 +134,8 @@ namespace ProjectComp1640.Controllers
                 Description = cls.Description,
                 StudentNames = cls.ClassStudents.Select(cs => cs.Student.User.FullName).DefaultIfEmpty("No Students").ToList(),
                 StudentIds = cls.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.Id).ToList(),
-                StudentUserIds = cls.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.UserId).ToList()
+                StudentUserIds = cls.ClassStudents.Where(cs => cs.Student?.User != null).Select(cs => cs.Student.UserId).ToList(),
+                ScheduleIds = cls.Schedules.Where(s => s.Id != null).Select(s => s.Id).ToList()
             };
             return Ok(classDto);
         }
@@ -170,7 +177,11 @@ namespace ProjectComp1640.Controllers
                 var tutor = await _context.Tutors.FirstOrDefaultAsync(t => t.UserId == tutorUser.Id);
                 cls.TutorId = tutor.Id;
             }
-            if (createClassDto.EndDate < createClassDto.StartDate)
+            if (createClassDto.StartDate < DateTime.Now)
+            {
+                return BadRequest("Start date cannot be in the past");
+            }
+            else if (createClassDto.EndDate < createClassDto.StartDate)
             {
                 return BadRequest("End date cannot be earlier than start date.");
             }
@@ -210,7 +221,7 @@ namespace ProjectComp1640.Controllers
                     throw;
                 }
             }
-            return NoContent();
+            return Ok("Class updated successfully");
         }
 
         [HttpDelete("delete-class/{id}")]
@@ -220,6 +231,11 @@ namespace ProjectComp1640.Controllers
             if (cls == null)
             {
                 return NotFound(new { message = "Cannot find this class." });
+            }
+            var checkClassSchedule = await _context.Classes.Include(c => c.Schedules).FirstOrDefaultAsync(c => c.Id == id);
+            if(checkClassSchedule.Schedules != null && checkClassSchedule.Schedules.Any())
+            {
+                _context.Schedules.RemoveRange(checkClassSchedule.Schedules);
             }
             _context.Classes.Remove(cls);
             await _context.SaveChangesAsync();

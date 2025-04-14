@@ -18,7 +18,6 @@ namespace ProjectComp1640.Controllers
             _dbContext = dbContext;
         }
         [HttpPost("create-schedule")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateSchedule(ScheduleDto scheduleDto)
         {
             var cls = await _dbContext.Classes.FirstOrDefaultAsync(c => c.Id == scheduleDto.ClassId);
@@ -31,16 +30,19 @@ namespace ProjectComp1640.Controllers
             {
                 return NotFound("Cannot find this classroom.");
             }
-            var dupSchedule = await _dbContext.Schedules.AnyAsync(s =>
+            if (scheduleDto.ScheduleDate < cls.StartDate ||  scheduleDto.ScheduleDate > cls.EndDate)
+            {
+                return BadRequest($"Schedule must be created between the class time: From {cls.StartDate} to {cls.EndDate}");
+            }
+            var dupSchedule = await _dbContext.Schedules.FirstOrDefaultAsync(s =>
                 s.ScheduleDate == scheduleDto.ScheduleDate &&
                 s.Day == scheduleDto.Day &&
                 s.Slot == scheduleDto.Slot &&
-                s.ClassId == scheduleDto.ClassId &&
                 s.ClassroomId == scheduleDto.ClassroomId
                 );
-            if (dupSchedule)
+            if (dupSchedule != null)
             {
-                return BadRequest($"There is a duplicate schedule of Class {scheduleDto.ClassId} in classroom {scheduleDto.ClassroomId} at ({scheduleDto.ScheduleDate:yyyy-MM-dd}) at slot {scheduleDto.Slot}.");
+                return BadRequest($"There is a duplicate schedule of Class {dupSchedule.ClassId} in classroom {dupSchedule.ClassroomId} at ({dupSchedule.ScheduleDate:yyyy-MM-dd}) at slot {dupSchedule.Slot}.");
             }
             var schedule = new Schedule
             {
@@ -116,16 +118,16 @@ namespace ProjectComp1640.Controllers
             {
                 return NotFound("Cannot find this classroom.");
             }
-            var dupSchedule = await _dbContext.Schedules.AnyAsync(s =>
+            var dupSchedule = await _dbContext.Schedules.FirstOrDefaultAsync(s =>
                 s.ScheduleDate == scheduleDto.ScheduleDate &&
                 s.Day == scheduleDto.Day &&
                 s.Slot == scheduleDto.Slot &&
-                s.ClassId == scheduleDto.ClassId &&
-                s.ClassroomId == scheduleDto.ClassroomId
+                s.ClassroomId == scheduleDto.ClassroomId &&
+                s.Id != id
                 );
-            if (dupSchedule)
+            if (dupSchedule != null)
             {
-                return BadRequest($"There is a duplicate schedule of Class {scheduleDto.ClassId} in classroom {scheduleDto.ClassroomId} at ({scheduleDto.ScheduleDate:yyyy-MM-dd}) at slot {scheduleDto.Slot}.");
+                return BadRequest($"There is a duplicate schedule of Class {dupSchedule.ClassId} in classroom {dupSchedule.ClassroomId} at ({dupSchedule.ScheduleDate:yyyy-MM-dd}) at slot {dupSchedule.Slot}.");
             }
             schedule.ScheduleDate = scheduleDto.ScheduleDate;
             schedule.Day = scheduleDto.Day;
@@ -134,7 +136,7 @@ namespace ProjectComp1640.Controllers
             schedule.ClassId = scheduleDto.ClassId;
             schedule.ClassroomId = scheduleDto.ClassroomId;
             await _dbContext.SaveChangesAsync();
-            return NoContent();
+            return Ok(schedule);
         }
         [HttpDelete("delete-schedule/{id}")]
         public async Task<IActionResult> DeleteSchedule(int id)

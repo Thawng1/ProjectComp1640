@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using ProjectComp1640.Dashboard;
 using ProjectComp1640.Data;
 using ProjectComp1640.Dtos.Dashboard;
 
@@ -8,10 +10,12 @@ using ProjectComp1640.Dtos.Dashboard;
 public class DashboardController : ControllerBase
 {
     private readonly ApplicationDBContext _context;
+    private readonly IHubContext<DashboardHub> _hubContext;
 
-    public DashboardController(ApplicationDBContext context)
+    public DashboardController(ApplicationDBContext context, IHubContext<DashboardHub> hub)
     {
         _context = context;
+        _hubContext = hub;
     }
 
     [HttpGet]
@@ -55,7 +59,7 @@ public class DashboardController : ControllerBase
             MonthlyStudentStats = monthlyStudentStats,
             TopTutors = topTutors
         };
-
+        await _hubContext.Clients.All.SendAsync("UpdateDashboard", dashboard);
         return Ok(dashboard);
     }
 }

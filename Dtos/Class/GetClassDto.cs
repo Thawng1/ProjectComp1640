@@ -15,5 +15,6 @@
         public List<string> StudentNames { get; set; } = new List<string>();
         public List<int> StudentIds { get; set; } = new List<int>();
         public List<string> StudentUserIds { get; set; } = new List<string>();
+        public List<int> ScheduleIds { get; set; } = new List<int>();
     }
 }
