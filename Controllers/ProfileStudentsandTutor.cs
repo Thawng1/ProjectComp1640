@@ -195,11 +195,13 @@ namespace ProjectComp1640.Controllers
             var userBlog = await _context.Blogs.Where(b => b.UserId == getUserId).ToListAsync();
             var userBlogIds = userBlog.Select(b => b?.Id).ToList();
             var commentsToDelete = await _context.Comments.Where(c => userBlogIds.Contains(c.BlogId)).ToListAsync();
-            var userComment = await _context.Comments.Where(c => c.UserId == getUserId).ToListAsync();  
+            var userComment = await _context.Comments.Where(c => c.UserId == getUserId).ToListAsync();
+            var relatedMessages = await _context.Messages.Where(m => m.SenderId == getUserId || m.ReceiverId == getUserId).ToListAsync();
             _context.Notifications.RemoveRange(userNotification);
             _context.Comments.RemoveRange(userComment);
             _context.Comments.RemoveRange(commentsToDelete);
-            _context.Blogs.RemoveRange(userBlog);   
+            _context.Blogs.RemoveRange(userBlog);
+            _context.Messages.RemoveRange(relatedMessages);
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();
             return Ok(new { Message = "Student deleted successfully!" });
