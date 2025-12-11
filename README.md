@@ -1,7 +1,3 @@
-Dưới đây là một bản **README.md** đầy đủ và chi tiết cho dự án **ProjectComp1640**, dựa trên mã nguồn và các chức năng đã phân tích. Bạn có thể sao chép nội dung này vào tệp `README.md` trong thư mục gốc của dự án.
-
------
-
 # ProjectComp1640 - Hệ Thống Quản Lý Trung Tâm Đào Tạo
 
 **ProjectComp1640** là một hệ thống Backend Web API mạnh mẽ được xây dựng trên nền tảng **ASP.NET Core (.NET 8)**. Dự án cung cấp giải pháp toàn diện để quản lý các hoạt động của một trung tâm giáo dục hoặc gia sư, bao gồm quản lý người dùng, lớp học, thời khóa biểu, blog và tích hợp các tính năng giao tiếp thời gian thực (Real-time).
